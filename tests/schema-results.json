@@ -1,0 +1,22 @@
+{
+  "valid_events": 166,
+  "event_types": [
+    "cart_converted",
+    "cart_emptied",
+    "cart_snapshot",
+    "checkout_started",
+    "consent_changed",
+    "entity_changed",
+    "entity_deleted",
+    "interaction_observed",
+    "order_snapshot",
+    "order_status_changed",
+    "page_viewed",
+    "payment_fact",
+    "privacy_erasure_requested",
+    "product_viewed",
+    "refund_recorded"
+  ],
+  "invalid_fixtures_rejected": 3,
+  "pass": true
+}

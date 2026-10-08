@@ -1,0 +1,74 @@
+[
+  {
+    "file": "magellan-for-woocommerce/magellan-for-woocommerce.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/uninstall.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/class-magellan-identity.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/class-magellan-admin.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/class-magellan-health.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/class-magellan-pixel.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/class-magellan-sender.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/class-magellan-cart.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/class-magellan-updater.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/class-magellan-tracker.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/v3/Protocol.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/v3/Outbox.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/v3/bootstrap.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/v3/Config.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/v3/Privacy.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/v3/Browser.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/v3/Capture.php",
+    "exit": 0
+  },
+  {
+    "file": "magellan-for-woocommerce/includes/v3/Admin.php",
+    "exit": 0
+  }
+]

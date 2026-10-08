@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       Magellan for WooCommerce
  * Plugin URI:        https://magellan.app
- * Description:       First-party attribution pixel for Magellan. Captures verified purchase data and sends it to Magellan for cross-platform attribution and overclaim detection.
- * Version:           2.5.0
+ * Description:       Consent-controlled website measurement and durable WooCommerce evidence delivery to Magellan.
+ * Version:           3.0.0-alpha.1
  * Author:            Magellan
  * Author URI:        https://magellan.app
  * License:           GPL-2.0+
@@ -13,7 +13,7 @@
  * Text Domain:       magellan-for-woocommerce
  * Domain Path:       /languages
  * WC requires at least: 7.0
- * WC tested up to:   9.x
+ * WC tested up to:   11.2.0
  *
  * @package Magellan
  */
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Constants
 // ---------------------------------------------------------------------
 
-define( 'MAGELLAN_VERSION',            '2.5.0' );
+define( 'MAGELLAN_VERSION',            '3.0.0-alpha.1' );
 define( 'MAGELLAN_PLUGIN_FILE',        __FILE__ );
 define( 'MAGELLAN_PLUGIN_DIR',         plugin_dir_path( __FILE__ ) );
 define( 'MAGELLAN_PLUGIN_URL',         plugin_dir_url( __FILE__ ) );
@@ -122,6 +122,9 @@ add_action(
 			return;
 		}
 
+		require_once MAGELLAN_PLUGIN_DIR . 'includes/v3/bootstrap.php';
+		if (\Magellan\V3\Config::active()) { return; }
+
 		$includes = [
 			'class-magellan-admin',
 			'class-magellan-identity',
@@ -201,6 +204,9 @@ register_deactivation_hook(
 		wp_clear_scheduled_hook( 'magellan_daily_cleanup' );
 		wp_clear_scheduled_hook( 'magellan_sync_check' );
 		wp_clear_scheduled_hook( 'magellan_health_check' );
+		wp_clear_scheduled_hook( 'magellan_v3_drain' );
+		wp_clear_scheduled_hook( 'magellan_v3_maintenance' );
+		if ( function_exists('as_unschedule_all_actions') ) { as_unschedule_all_actions('magellan_v3_drain', [], 'magellan-v3'); }
 	}
 );
 

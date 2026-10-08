@@ -1,226 +1,43 @@
 === Magellan for WooCommerce ===
-Contributors: magellanapp
-Tags: woocommerce, analytics, attribution, pixel, conversion tracking
+Contributors: magellan
+Tags: analytics, woocommerce, attribution
 Requires at least: 6.0
-Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 2.5.0
-WC requires at least: 7.0
-WC tested up to: 9.x
+Stable tag: 3.0.0-alpha.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-First-party attribution pixel for Magellan. Captures verified purchase data and sends it to Magellan for cross-platform attribution and overclaim detection.
+Consent-controlled website measurement and durable channel evidence for Magellan.
 
 == Description ==
+Magellan owns inventory, canonical orders and finance. This plugin supplies website observations and WooCommerce channel facts through a durable local outbox.
 
-**Magellan for WooCommerce** is the truth layer between your store and your ad platforms.
+This is a development candidate. The v3 Magellan backend must be implemented and verified before connection. Urbanflowers staging and deployment are separate later steps.
 
-Every ad platform — Meta, Google, TikTok — claims credit for your sales. Most of the time they overclaim. A store showing ROAS 4x in Meta Ads Manager may be running at 2.8x in reality. Without verified first-party data, you cannot know.
+Features: direct browser event intake, host-only identity cookies, consent and GPC controls, page/product and checkout observations, WooCommerce order/refund/cart evidence, exact money strings, signed asynchronous delivery, per-event receipts, explicit retry, diagnostics and privacy hooks.
 
-This plugin gives Magellan the ground truth it needs to tell you what actually happened.
-
-**What this plugin does:**
-
-* Captures UTM parameters and click IDs (fbclid, gclid, ttclid, and more) when a visitor arrives at your store
-* Tracks the customer journey from first visit to purchase — across sessions and devices
-* Hashes customer email and phone server-side (SHA-256) before any data leaves WordPress
-* Stamps verified attribution data onto every WooCommerce order
-* Sends one signed verified event per order to Magellan's API
-* Reports tracking health (conflicting plugins, consent state, checkout type)
-
-**What this plugin does NOT do:**
-
-* It does not talk to Meta, Google, TikTok, or Klaviyo directly
-* It does not store any ad-platform API credentials on your WordPress server
-* It does not slow your store down — the frontend pixel is under 2KB, async + deferred
-
-All ad-platform Conversions API sends, attribution analysis, and overclaim detection live in Magellan's backend.
-
-**One field. That's all.**
-
-The settings page asks for one thing: your Magellan Account ID. Everything else is auto-configured.
-
-**Requirements:**
-
-* WordPress 6.0+
-* WooCommerce 7.0+
-* PHP 8.0+
-* A Magellan account ([magellan.app](https://magellan.app))
+V2 connection settings are preserved. Until the new signed challenge succeeds, existing legacy behavior remains available. After activation of v3, its producer replaces the old producer. Reports, financial rules, advertising and stock remain in Magellan.
 
 == Installation ==
+1. Upload the ZIP through WordPress Plugins, using the existing magellan-for-woocommerce slug.
+2. Open WooCommerce > Magellan v3.
+3. Supply the installation configuration issued by a compatible Magellan backend.
+4. The signed challenge must pass before the plugin reports Connected.
+5. Configure the consent adapter and purge the storefront cache. Unknown consent disables optional analytics.
+6. Verify queue receipts and the actual runner. Use real cron or WP-CLI on low-traffic sites.
 
-= Auto-install (preferred) =
+== Operations ==
+wp magellan status
+wp magellan drain
+wp magellan reconcile
+wp magellan maintenance
 
-1. Connect WooCommerce in your Magellan dashboard at app.magellan.app
-2. Approve the consent screen (one click, two scopes: WooCommerce REST + WordPress Application Password)
-3. Magellan installs and configures this plugin automatically
-4. Done — verified attribution starts immediately
-
-= Manual install =
-
-1. Upload the plugin folder to `/wp-content/plugins/` or install via WordPress.org
-2. Activate through the **Plugins** menu
-3. Go to **WooCommerce → Magellan**
-4. Paste your Magellan Account ID (format: `mgln_live_xxxxxxxxxxxxxx`)
-5. Save
-
-== Frequently Asked Questions ==
-
-= Does this plugin slow down my store? =
-
-No. The frontend pixel is under 2KB, loaded asynchronously and deferred in the footer. All verified-event sending happens server-side in background jobs via Action Scheduler. The customer's thank-you page never waits for an external API call.
-
-= What data is sent to Magellan? =
-
-For each completed order: order total, items, hashed email, hashed phone, UTM parameters, click IDs, session count, and first-touch attribution. Raw email and phone never leave WordPress — only SHA-256 hashes.
-
-= Does this conflict with Meta Pixel, Google Tag Manager, or other tracking plugins? =
-
-The plugin detects common tracking plugins (PixelYourSite, Meta Pixel, Google Site Kit, GTM4WP) and surfaces conflicts in your Magellan dashboard. Verified event IDs are designed to deduplicate against your existing pixel events on Meta and Google.
-
-= Is this GDPR compliant? =
-
-The plugin honors a `magellan_tracking_enabled` filter for integration with your consent management plugin. When tracking is disabled, the pixel does not load and no events are sent. The plugin also exposes WordPress privacy erasure hooks so customer data can be removed on request.
-
-= What happens to data when I uninstall? =
-
-Plugin options (account ID, signing secret) are removed. Order metadata stamped by the plugin (`_mgln_*`) is preserved so reinstalling restores historical attribution.
-
-== Screenshots ==
-
-1. Settings page — one field, Account ID only
-2. Magellan dashboard showing Platform Reported vs Magellan Verified ROAS
-3. Tracking Health report in Magellan Data department
-4. Customer lifetime journey map built from plugin attribution data
-
-== External services ==
-
-This plugin connects to **Magellan's API** (default: https://api.magellan.app) to deliver verified attribution data for your WooCommerce orders. The destination is configurable via the `MAGELLAN_API_BASE` constant in `wp-config.php` or set automatically during the Magellan dashboard install flow.
-
-**What data is sent, when, and why:**
-
-* **Order events** — sent when a WooCommerce order moves to `processing` or `completed` status (delayed ~10 seconds via Action Scheduler). Payload includes: order ID, order number, currency, totals (subtotal, shipping, tax, discount, total), line items (SKU, name, quantity, unit price, line total), the order's hashed customer email (SHA-256, never raw), hashed phone (SHA-256, country-aware E.164 normalization, never raw), attribution touches (UTM source/medium/campaign, click IDs such as fbclid/gclid/ttclid, session count, first-touch landing URL, referrer), customer IP address, and User-Agent. Purpose: Magellan cross-references this against what Meta / Google / TikTok / Klaviyo claim, then surfaces overclaim and lets the Conversions API send only the verified events.
-* **Refund / cancellation events** — sent when WooCommerce records a refund or cancels an order that previously sent a verified event. Payload includes refund amount + reason (or cancellation flag), original event ID, hashed identity, currency, and total. Purpose: keep ad-platform conversion counts honest as refunds happen.
-* **Cart-state capture** — when the cart changes (item added, quantity updated, item removed, emptied) the plugin captures an anonymous cart snapshot `{cart_token, attribution, cart}` (NO email) **server-side** via WooCommerce cart hooks and forwards it (signed) to Magellan in a background job. The `cart_token` is a random per-browser identifier set in a first-party cookie by the pixel; it is not derived from any personal data. Purpose: abandoned-cart tracking and funnel analytics.
-* **Cart email capture** — when a shopper types an email into the WooCommerce checkout, the plugin's frontend JS hashes the email (SHA-256, client-side) and POSTs `{cart_token, identity.email_hash, attribution, cart}` to a local plugin REST endpoint, which signs and forwards to Magellan. This is what links the earlier anonymous cart to a (hashed) identity. The checkout-email route is rate-limited to 10 requests per IP per minute. Purpose: abandoned-cart attribution and remarketing tied to verified opt-in.
-* **Identity batch** — once on plugin activation (and on demand thereafter), the plugin sends a batched list of historical customer identities: hashed email + hashed phone + first/last seen timestamp + order count + external customer ID. Sent in chunks of 500. Purpose: backfill cross-store identity matching for already-completed orders.
-* **Tracking Health report** — once per day (and immediately on plugin activation / deactivation of other plugins) the plugin sends a non-sensitive site profile: WordPress / WooCommerce / PHP versions, HPOS status, checkout type, active theme name, site locale, multisite flag, site URL, count of events sent in the last 24h, a list of conflicting tracking plugins detected by file path, and the slug of any consent or cache plugin detected. Purpose: warn the operator when a duplicate Meta Pixel or GTM container would otherwise cause double-counting.
-
-**What this plugin does NOT send:**
-
-* Raw email addresses or phone numbers (always SHA-256 hashed first)
-* Payment method details, card numbers, or any financial credentials
-* Shopper passwords, session cookies, or login tokens
-* Product images or descriptions
-* Comments, reviews, or any blog/CMS content
-* Customer addresses
-* WordPress user accounts other than their email hash (used as a stable customer identifier)
-
-**Magellan privacy + terms:**
-
-* Privacy policy: https://magellan.app/privacy
-* Terms of service: https://magellan.app/terms
-
-Use of this plugin requires a Magellan account. Site operators are responsible for disclosing this data flow in their own site's privacy policy and obtaining any consent required by their jurisdiction (GDPR, CCPA, PDPA, etc.). The plugin respects the `magellan_tracking_enabled` filter so consent-management plugins can suppress all data flow when a visitor has not consented.
-
-== Privacy and GDPR ==
-
-This plugin is designed to be compatible with consent-management workflows and PII-minimization policies:
-
-* **No raw PII leaves WordPress.** Email and phone are SHA-256 hashed (with country-aware E.164 normalization for phone) before any transmission. Magellan stores only the hashes.
-* **No browser fingerprinting.** The plugin's first-party pixel sets a single cookie (`_mgln`, 180-day TTL, SameSite=Lax) carrying UTM parameters, click IDs (fbclid, gclid, gbraid, wbraid, ttclid, msclkid, twclid), referrer, and session count. No canvas fingerprinting, no device enumeration, no third-party cookies.
-* **Consent integration.** Apply the `magellan_tracking_enabled` filter (return `false` from your consent-management plugin) to suppress the pixel and skip all server-side event sending until consent is granted. Apply the `magellan_consent_state` filter to record consent state (`granted` / `denied` / `unknown`) on each outbound event.
-* **Right to erasure.** The plugin honors WordPress's `Personal_Data_Eraser` hooks. Hashed identity data tied to a specific order is removed via the standard WP privacy tools.
-* **Data residency.** Magellan's API runs in regions disclosed at https://magellan.app/data-residency.
+See BUILD-HANDOFF.md in the source bundle for schemas, endpoint contracts, migration, validation results and release gates.
 
 == Changelog ==
-
-= 2.5.0 =
-* **Cart capture moved server-side — universal, no browser listener.** Cart state is now captured via WooCommerce's own server-side hooks (`woocommerce_add_to_cart`, item removed, quantity updated, emptied), snapshotted once per request and sent asynchronously (Action Scheduler). This fires on every real cart change regardless of theme, Blocks vs classic, custom add-to-cart, or whether cart fragments are enabled — and never on plain page loads. It removes the previous browser-side listener (`magellan-cart.js`), its per-visitor polling/Store-API traffic, and the full-page-cache blind spot that could hide tracking from anonymous visitors. The attribution pixel keeps running client-side (UTM/click-IDs are browser-only) and now also sets the `_mgln_cart_token` cookie the server reads. Checkout email capture stays client-side (email-before-order is browser-only) and now carries the cart so attaching the email never blanks captured items. No settings change; the cart→order conversion link is unchanged.
-
-= 2.4.3 =
-* **Fix (important): the cart is now captured the moment it changes, even on stores with cart fragments disabled.** The listener previously relied on WooCommerce's JS cart events (`added_to_cart`, etc.), which only fire when the cart-fragments script (classic) or the Cart/Checkout blocks are active. On stores that disable fragments, add-to-cart fired no event, so a cart was only ever recorded on the *next page load* — meaning a fresh visitor who added an item and didn't navigate was never captured. The listener now also watches the underlying cart-mutation network request (classic `?wc-ajax=add_to_cart` / `?add-to-cart=`, and the WooCommerce Store API) and snapshots as soon as it completes — theme-agnostic, no dependency on fragments. Also re-checks when the tab becomes visible again and on back/forward-cache restores.
-
-= 2.4.2 =
-* **Change: the API base is now driven by the backend that provisions the store.** The stored `magellan_api_base` (sent by the configure callback / `/bootstrap` response) now takes priority over the `MAGELLAN_API_BASE` wp-config constant, instead of the other way around. A store sends data to whichever backend installed it, so a dev install self-configures to the dev backend and a production install to production — without editing wp-config. The wp-config constant is still honored as a pre-provisioning bootstrap target / manual fallback when nothing has been provisioned yet. (Fixes the case where a stale `MAGELLAN_API_BASE` constant pinned a dev-provisioned store to production.) The settings → Status panel now shows which source the base came from.
-
-= 2.4.1 =
-* **Fix (critical): anonymous cart-state events were never recorded.** The site-side `/wp-json/magellan/v1/cart` handler read the cart with a server-side `wc_load_cart()` call that throws a PHP fatal in the custom REST context on some stores (e.g. when `WC()->customer` isn't initialized), returning HTTP 500 *before* the event was forwarded to Magellan. The listener only remembers a cart as sent on a 2xx, so it retried the same event on every page — and the cart never reached the backend. The cart is now read in the browser from WooCommerce's own Store API (`/wp-json/wc/store/v1/cart`) — REST-safe and authoritative — and the handler can no longer 500 (cart-snapshot and forward are both guarded; a failure degrades to a clean response instead of a fatal).
-* **Fix: carts filled on a previous page are now captured.** The listener also snapshots once on page load, not only on in-page AJAX cart events — so a cart populated before the script ran (the common add-to-cart-then-navigate flow) is captured immediately.
-* The no-op suppression no longer depends on the `woocommerce_cart_hash` cookie (which is absent when cart fragments are disabled); it dedupes on a content signature derived from the Store API cart instead.
-
-= 2.4.0 =
-* **New: automatic updates.** The plugin now tells WordPress about new releases, so installed stores see the native "update available" notice and can update in one click — or fully automatically if you enable the per-plugin auto-update toggle. Updates download and overwrite the existing build in place, preserving your settings. (Until the plugin is on wordpress.org, the update source is its GitHub release; this is removed once it's listed on wordpress.org.)
-
-= 2.3.1 =
-* **Fix (important):** completed orders are now linked back to their cart. The order's `cart_token` is stamped onto the WooCommerce order and included in the verified `order_placed` event, so the backend marks the matching cart `converted` — without this, the abandoned-cart sweep could flag a completed purchase as "abandoned". (Pairs with the matching backend fix.)
-* Fix: the cart listener no longer drops a cart change that arrives while a previous send is still in flight (queues + flushes it).
-* Fix: a brand-new visitor with an empty cart no longer records a phantom zero-item cart.
-* Fix: the anonymous `/cart` route and the checkout `/cart-email` route now have separate per-IP rate-limit budgets, so cart-change traffic can't starve the higher-value checkout email capture.
-* Hardening: all `localStorage` access in the cart listener is guarded, so a storage-disabled browser degrades gracefully instead of silently disabling capture.
-
-= 2.3.0 =
-* **New: cart-state capture for abandoned-cart tracking.** A new front-end listener (`assets/magellan-cart.js`, enqueued site-wide) records the cart on every change — add to cart, quantity update, remove — across both classic and Blocks WooCommerce, *before* the shopper reaches checkout. Carts are captured anonymously (keyed by `cart_token`, no email); identity is stitched on later when the shopper enters their email at checkout. This enables real abandoned-cart tracking instead of only seeing carts that reached the checkout email step.
-* **New REST route** `POST /wp-json/magellan/v1/cart` (email optional) for the anonymous cart-state events. The existing `/cart-email` route (email required) is unchanged for checkout email capture. Both share validation, rate limiting, and the signed-forward path.
-* Cart snapshots now load the WooCommerce cart via `wc_load_cart()` in the REST context, so the server-side snapshot is correct on any page (shop / product / archive), not just checkout.
-* The listener debounces (~900ms) and diffs the `woocommerce_cart_hash` cookie to suppress no-op events (e.g. page-load fragment refreshes), staying within the 10/min rate limit.
-* Requires the matching backend release that accepts anonymous (no-email) cart events.
-
-= 2.2.3 =
-* **Fix (CRITICAL):** account_id validation regex now matches the backend's documented alphabet. The previous regex `[a-z2-7]` allowed `l` and `o` (which the backend never produces per Truth Layer spec §2.2's ambiguous-character exclusion) and excluded `8` and `9` (which the backend produces ~59% of the time). Result: most newly-minted account IDs failed validation, causing `/wp-json/magellan/v1/configure` to 400 with `magellan_bad_account_id`. Corrected to `[a-km-np-z2-9]` — same 32 chars as the backend's `abcdefghijkmnpqrstuvwxyz23456789` alphabet.
-* Three regex sites updated: REST configure handler, REST settings sanitize callback, admin-post bootstrap form handler.
-
-= 2.2.2 =
-* Added: LICENSE.txt (GPL-2.0+) bundled in plugin distribution.
-* Added: `External services` and `Privacy and GDPR` sections in readme — full disclosure of what data is sent to Magellan's API, when, and why.
-* Improved: all user-facing strings wrapped in `__()` / `esc_html__()` and `load_plugin_textdomain` registered. Plugin is now translation-ready.
-* Fixed: pixel JS no longer hard-codes plugin version (was reporting stale `2.2.0`); reads from the enqueued script's WP-injected `?ver=` parameter instead.
-* Internal: WordPress.org coding standards review pass — output escaping audit, nonce / capability check audit, sanitize/escape symmetry on all REST and admin-post handlers.
-
-= 2.2.1 =
-
-= 2.2.1 =
-* **Fix (CRITICAL):** signing secret was passed to HMAC as its base64 string instead of the decoded raw bytes. Every signed request 401'd against the backend. The plugin now base64-decodes the stored secret to bytes before signing. This matches the backend's `account_signing_secrets.secret_b64` → raw-bytes-as-HMAC-key contract.
-* **Fix:** `MAGELLAN_API_BASE` now resolves from priority chain: `wp-config.php` constant → `magellan_api_base` option → default. `handle_configure` (Path A auto-install) persists `api_base` if the backend sends it. Trailing slashes are stripped on persist.
-* **New:** Path B manual-install bootstrap. Admin settings page now shows "Install with token" form when the signing secret is not yet stored. Plugin POSTs `{account_id, install_token}` to `MAGELLAN_API_BASE/bootstrap`, stores the returned signing secret + api_base, and surfaces typed error messages (unknown_token, expired_token, already_consumed, etc.). Path A auto-install remains the preferred flow.
-* **New:** "API base" row in the admin Status section so operators can verify which backend the plugin is talking to (and whether it came from the wp-config constant).
-
-= 2.2.0 =
-* Aligned with Magellan Truth Layer Backend Spec v1.0
-* **Fix:** verified event now fires on `woocommerce_order_status_processing` (not on `_created`). Avoids events for orders that never confirm (PromptPay timeouts, declined bank transfers).
-* **New:** refund events — `woocommerce_order_refunded` fires a negative conversion event to Magellan.
-* **New:** multi-currency support — payload carries source currency; backend handles base conversion.
-* **New:** HMAC-SHA256 signing on every outbound request (Stripe-style `t=<ts>,v1=<hex>`).
-* **New:** two-credential auto-install via WooCommerce REST + WordPress Application Password.
-* Verified event payload restructured with nested `identity`, `attribution`, `context` objects.
-
-= 2.1.0 =
-* First-party pixel with UTM and click ID capture (fbclid, gclid, gbraid, wbraid, ttclid, msclkid, twclid)
-* Server-side order attribution using WooCommerce PHP hooks
-* Identity resolution with country-aware E.164 phone normalization
-* Two-phase historical identity sync — registered customers and guest checkout emails
-* Cart tracking and checkout email capture
-* Tracking health reporting with conflict detection
-* HPOS compatible
-* WooCommerce Blocks compatible
-
-== Upgrade Notice ==
-
-= 2.3.1 =
-Important fix: links completed orders back to their cart so the abandoned-cart sweep can't mislabel a purchase as abandoned. Pairs with the matching backend release. Upgrade recommended for anyone on 2.3.0.
-
-= 2.3.0 =
-Adds cart-state capture for abandoned-cart tracking (records carts on add/update/remove, not just at checkout). Requires the matching backend release. No action needed beyond updating.
-
-= 2.2.3 =
-CRITICAL: fixes account_id regex that rejected ~59% of valid backend-minted IDs (those containing `8` or `9`). Earlier 2.2.x installs would silently fail to configure via the auto-install flow. Upgrade required.
-
-= 2.2.2 =
-WordPress.org submission-ready release. Adds LICENSE.txt, full External Services and Privacy disclosure, and translation-ready strings. No behavior change vs 2.2.1.
-
-= 2.2.1 =
-CRITICAL fix: HMAC signing now matches backend contract (base64-decode the signing secret before signing). 2.2.0 installs cannot deliver verified events — upgrade required.
-
-= 2.2.0 =
-Aligns with Magellan backend Truth Layer v1.0. Fixes a critical issue where verified events were fired for orders that subsequently failed. Adds refund handling, multi-currency, and HMAC-signed requests.
+= 3.0.0-alpha.1 =
+* Added store-scoped v3 protocol and signed challenge.
+* Added durable MySQL outbox, explicit retries, receipts, capacity limits and diagnostics.
+* Added consent-controlled session/page/product collector and checkout adapters.
+* Added order/refund/cart lifecycle capture and bounded reconciliation.
+* Preserved legacy mode until an explicit successful v3 connection.

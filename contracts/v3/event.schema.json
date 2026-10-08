@@ -1,0 +1,2191 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "3.0.0"
+    },
+    "plugin_version": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "event_type": {
+      "enum": [
+        "page_viewed",
+        "product_viewed",
+        "checkout_started",
+        "checkout_stage_observed",
+        "checkout_error_observed",
+        "interaction_observed",
+        "consent_changed",
+        "cart_snapshot",
+        "cart_emptied",
+        "cart_converted",
+        "order_snapshot",
+        "order_status_changed",
+        "payment_fact",
+        "refund_recorded",
+        "entity_changed",
+        "entity_deleted",
+        "health_report",
+        "privacy_erasure_requested"
+      ]
+    },
+    "site_id": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "installation_id": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "environment": {
+      "enum": [
+        "production",
+        "test",
+        "development"
+      ]
+    },
+    "producer": {
+      "enum": [
+        "browser",
+        "wordpress"
+      ]
+    },
+    "evidence_class": {
+      "enum": [
+        "observation",
+        "source_fact"
+      ]
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "visitor_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "session_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "cart_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "entity": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "source_system": {
+              "const": "woocommerce"
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "id": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "revision": {
+              "type": "string",
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "source_system",
+            "type",
+            "id",
+            "revision"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "origin_system": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "operation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 256
+    },
+    "causation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 256
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "consent": {
+      "type": "object",
+      "properties": {
+        "analytics": {
+          "enum": [
+            "granted",
+            "denied",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "advertising": {
+          "enum": [
+            "granted",
+            "denied",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "email_marketing": {
+          "enum": [
+            "granted",
+            "denied",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "sms_marketing": {
+          "enum": [
+            "granted",
+            "denied",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "effective_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "policy_version": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "epoch": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gpc": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "analytics",
+        "advertising",
+        "email_marketing",
+        "sms_marketing",
+        "source",
+        "effective_at",
+        "policy_version",
+        "epoch",
+        "gpc"
+      ],
+      "additionalProperties": false
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "plugin_version",
+    "event_id",
+    "event_type",
+    "site_id",
+    "installation_id",
+    "environment",
+    "producer",
+    "evidence_class",
+    "occurred_at",
+    "captured_at",
+    "visitor_id",
+    "session_id",
+    "cart_id",
+    "entity",
+    "origin_system",
+    "operation_id",
+    "causation_id",
+    "sequence",
+    "consent",
+    "payload"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://magellan.app/contracts/v3/event.schema.json",
+  "oneOf": [
+    {
+      "properties": {
+        "event_type": {
+          "const": "page_viewed"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "navigation_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "path": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "page_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            },
+            "entry_type": {
+              "enum": [
+                "home",
+                "content",
+                "product",
+                "category",
+                "commercial_landing",
+                "utility",
+                "unknown"
+              ]
+            },
+            "classification_version": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "storefront": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "served_version": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            },
+            "product_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            },
+            "variation_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            },
+            "source_evidence": {
+              "type": "object",
+              "properties": {
+                "click_id_types": {
+                  "type": "array",
+                  "maxItems": 7,
+                  "items": {
+                    "enum": [
+                      "gclid",
+                      "gbraid",
+                      "wbraid",
+                      "fbclid",
+                      "msclkid",
+                      "ttclid",
+                      "twclid"
+                    ]
+                  }
+                },
+                "utm": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "medium": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "campaign": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "content": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "term": {
+                      "type": "string",
+                      "maxLength": 128
+                    }
+                  },
+                  "required": [],
+                  "additionalProperties": false
+                },
+                "click_ids": {
+                  "type": "object",
+                  "properties": {
+                    "gclid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "gbraid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "wbraid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "fbclid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "msclkid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "ttclid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "twclid": {
+                      "type": "string",
+                      "maxLength": 200
+                    }
+                  },
+                  "required": [],
+                  "additionalProperties": false
+                },
+                "referrer_domain": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 256
+                }
+              },
+              "required": [
+                "click_id_types",
+                "utm",
+                "click_ids",
+                "referrer_domain"
+              ],
+              "additionalProperties": false
+            },
+            "entry": {
+              "type": "object"
+            },
+            "continuity": {
+              "enum": [
+                "shared",
+                "page_local"
+              ]
+            },
+            "session_started_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "session_aliases": {
+              "type": "array",
+              "maxItems": 10,
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "stream_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "navigation_id",
+            "path",
+            "page_id",
+            "entry_type",
+            "classification_version",
+            "storefront",
+            "served_version",
+            "product_id",
+            "variation_id",
+            "source_evidence",
+            "entry",
+            "continuity",
+            "session_started_at",
+            "session_aliases",
+            "stream_id"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "browser"
+        },
+        "evidence_class": {
+          "const": "observation"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "product_viewed"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "navigation_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "path": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "page_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            },
+            "entry_type": {
+              "enum": [
+                "home",
+                "content",
+                "product",
+                "category",
+                "commercial_landing",
+                "utility",
+                "unknown"
+              ]
+            },
+            "classification_version": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "storefront": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "served_version": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            },
+            "product_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            },
+            "variation_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            },
+            "source_evidence": {
+              "type": "object",
+              "properties": {
+                "click_id_types": {
+                  "type": "array",
+                  "maxItems": 7,
+                  "items": {
+                    "enum": [
+                      "gclid",
+                      "gbraid",
+                      "wbraid",
+                      "fbclid",
+                      "msclkid",
+                      "ttclid",
+                      "twclid"
+                    ]
+                  }
+                },
+                "utm": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "medium": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "campaign": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "content": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "term": {
+                      "type": "string",
+                      "maxLength": 128
+                    }
+                  },
+                  "required": [],
+                  "additionalProperties": false
+                },
+                "click_ids": {
+                  "type": "object",
+                  "properties": {
+                    "gclid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "gbraid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "wbraid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "fbclid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "msclkid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "ttclid": {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    "twclid": {
+                      "type": "string",
+                      "maxLength": 200
+                    }
+                  },
+                  "required": [],
+                  "additionalProperties": false
+                },
+                "referrer_domain": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 256
+                }
+              },
+              "required": [
+                "click_id_types",
+                "utm",
+                "click_ids",
+                "referrer_domain"
+              ],
+              "additionalProperties": false
+            },
+            "entry": {
+              "type": "object"
+            },
+            "continuity": {
+              "enum": [
+                "shared",
+                "page_local"
+              ]
+            },
+            "session_started_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "session_aliases": {
+              "type": "array",
+              "maxItems": 10,
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "stream_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "navigation_id",
+            "path",
+            "page_id",
+            "entry_type",
+            "classification_version",
+            "storefront",
+            "served_version",
+            "product_id",
+            "variation_id",
+            "source_evidence",
+            "entry",
+            "continuity",
+            "session_started_at",
+            "session_aliases",
+            "stream_id"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "browser"
+        },
+        "evidence_class": {
+          "const": "observation"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "checkout_started"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "checkout_attempt_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "adapter": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "stage": {
+              "type": "string",
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "page",
+            "checkout_attempt_id",
+            "adapter",
+            "stage"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "browser"
+        },
+        "evidence_class": {
+          "const": "observation"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "checkout_stage_observed"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "checkout_attempt_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "adapter": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "stage": {
+              "type": "string",
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "page",
+            "checkout_attempt_id",
+            "adapter",
+            "stage"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "browser"
+        },
+        "evidence_class": {
+          "const": "observation"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "checkout_error_observed"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "checkout_attempt_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "adapter": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "stage": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "category": {
+              "enum": [
+                "coupon_rejected",
+                "validation_failed",
+                "payment_failed",
+                "technical_error",
+                "unknown"
+              ]
+            }
+          },
+          "required": [
+            "page",
+            "checkout_attempt_id",
+            "adapter",
+            "stage",
+            "category"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "browser"
+        },
+        "evidence_class": {
+          "const": "observation"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "interaction_observed"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "component_id": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "action_id": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "served_version": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "page",
+            "component_id",
+            "action_id",
+            "served_version"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "browser"
+        },
+        "evidence_class": {
+          "const": "observation"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "consent_changed"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "previous_epoch": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "previous_epoch"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "browser"
+        },
+        "evidence_class": {
+          "const": "observation"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "cart_snapshot"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "snapshot_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "pages": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "cart_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "revision": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "lifecycle": {
+              "const": "open"
+            },
+            "currency": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "exponent": {
+              "type": "integer"
+            },
+            "merchandise_total": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
+                "exponent": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 6
+                },
+                "amount_minor": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]*)$"
+                }
+              },
+              "required": [
+                "currency",
+                "exponent",
+                "amount_minor"
+              ],
+              "additionalProperties": false
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "line_id": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "refunded_line_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 256
+                  },
+                  "product_id": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "variation_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 256
+                  },
+                  "sku": {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  "quantity": {
+                    "type": "string",
+                    "pattern": "^-?[0-9]+(\\.[0-9]+)?$"
+                  },
+                  "unit": {
+                    "const": "item"
+                  },
+                  "subtotal": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "total": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "tax": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "line_id",
+                  "refunded_line_id",
+                  "product_id",
+                  "variation_id",
+                  "sku",
+                  "quantity",
+                  "unit",
+                  "subtotal",
+                  "total",
+                  "tax"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 100
+            }
+          },
+          "required": [
+            "snapshot_id",
+            "page",
+            "pages",
+            "cart_id",
+            "revision",
+            "lifecycle",
+            "currency",
+            "exponent",
+            "merchandise_total",
+            "items"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "wordpress"
+        },
+        "evidence_class": {
+          "const": "source_fact"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "cart_emptied"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "cart_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "revision": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "lifecycle": {
+              "const": "empty"
+            },
+            "reason": {
+              "type": "string",
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "cart_id",
+            "revision",
+            "lifecycle",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "wordpress"
+        },
+        "evidence_class": {
+          "const": "source_fact"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "cart_converted"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "cart_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "order_id": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "lifecycle": {
+              "const": "converted"
+            }
+          },
+          "required": [
+            "cart_id",
+            "order_id",
+            "lifecycle"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "wordpress"
+        },
+        "evidence_class": {
+          "const": "source_fact"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "order_snapshot"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "source_system": {
+              "const": "woocommerce"
+            },
+            "order_id": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "source_revision": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "status": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "created_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "modified_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "exponent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "amounts": {
+              "type": "object",
+              "properties": {
+                "subtotal": {
+                  "type": "object",
+                  "properties": {
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    },
+                    "exponent": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 6
+                    },
+                    "amount_minor": {
+                      "type": "string",
+                      "pattern": "^-?(0|[1-9][0-9]*)$"
+                    }
+                  },
+                  "required": [
+                    "currency",
+                    "exponent",
+                    "amount_minor"
+                  ],
+                  "additionalProperties": false
+                },
+                "discount": {
+                  "type": "object",
+                  "properties": {
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    },
+                    "exponent": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 6
+                    },
+                    "amount_minor": {
+                      "type": "string",
+                      "pattern": "^-?(0|[1-9][0-9]*)$"
+                    }
+                  },
+                  "required": [
+                    "currency",
+                    "exponent",
+                    "amount_minor"
+                  ],
+                  "additionalProperties": false
+                },
+                "shipping": {
+                  "type": "object",
+                  "properties": {
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    },
+                    "exponent": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 6
+                    },
+                    "amount_minor": {
+                      "type": "string",
+                      "pattern": "^-?(0|[1-9][0-9]*)$"
+                    }
+                  },
+                  "required": [
+                    "currency",
+                    "exponent",
+                    "amount_minor"
+                  ],
+                  "additionalProperties": false
+                },
+                "tax": {
+                  "type": "object",
+                  "properties": {
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    },
+                    "exponent": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 6
+                    },
+                    "amount_minor": {
+                      "type": "string",
+                      "pattern": "^-?(0|[1-9][0-9]*)$"
+                    }
+                  },
+                  "required": [
+                    "currency",
+                    "exponent",
+                    "amount_minor"
+                  ],
+                  "additionalProperties": false
+                },
+                "total": {
+                  "type": "object",
+                  "properties": {
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    },
+                    "exponent": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 6
+                    },
+                    "amount_minor": {
+                      "type": "string",
+                      "pattern": "^-?(0|[1-9][0-9]*)$"
+                    }
+                  },
+                  "required": [
+                    "currency",
+                    "exponent",
+                    "amount_minor"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "subtotal",
+                "discount",
+                "shipping",
+                "tax",
+                "total"
+              ],
+              "additionalProperties": false
+            },
+            "lines": {
+              "type": "array",
+              "maxItems": 50,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "line_id": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "refunded_line_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 256
+                  },
+                  "product_id": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "variation_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 256
+                  },
+                  "sku": {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  "quantity": {
+                    "type": "string",
+                    "pattern": "^-?[0-9]+(\\.[0-9]+)?$"
+                  },
+                  "unit": {
+                    "const": "item"
+                  },
+                  "subtotal": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "total": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "tax": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "line_id",
+                  "refunded_line_id",
+                  "product_id",
+                  "variation_id",
+                  "sku",
+                  "quantity",
+                  "unit",
+                  "subtotal",
+                  "total",
+                  "tax"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "fees": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "line_id": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "total": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "tax": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "line_id",
+                  "total",
+                  "tax"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "taxes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "line_id": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "rate_id": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "total": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "shipping": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "line_id",
+                  "rate_id",
+                  "total",
+                  "shipping"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "payment_method": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "transaction_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            },
+            "paid_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "checkout_context": {
+              "type": "object"
+            },
+            "native_attribution": {
+              "type": "object"
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "pages": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "snapshot_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "channel_origin": {
+              "enum": [
+                "web_checkout",
+                "other",
+                "unknown"
+              ]
+            },
+            "subscriptions": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "source_system",
+            "order_id",
+            "source_revision",
+            "status",
+            "created_at",
+            "modified_at",
+            "currency",
+            "exponent",
+            "amounts",
+            "lines",
+            "fees",
+            "taxes",
+            "payment_method",
+            "transaction_id",
+            "paid_at",
+            "checkout_context",
+            "native_attribution",
+            "page",
+            "pages",
+            "snapshot_id",
+            "channel_origin",
+            "subscriptions"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "wordpress"
+        },
+        "evidence_class": {
+          "const": "source_fact"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "order_status_changed"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "from_status": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "to_status": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "source_revision": {
+              "type": "string",
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "order_id",
+            "from_status",
+            "to_status",
+            "source_revision"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "wordpress"
+        },
+        "evidence_class": {
+          "const": "source_fact"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "payment_fact"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "payment_method": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "transaction_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            },
+            "source_state": {
+              "const": "woocommerce_payment_complete"
+            },
+            "paid_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "settlement_verified": {
+              "const": false
+            }
+          },
+          "required": [
+            "order_id",
+            "payment_method",
+            "transaction_id",
+            "source_state",
+            "paid_at",
+            "settlement_verified"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "wordpress"
+        },
+        "evidence_class": {
+          "const": "source_fact"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "refund_recorded"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "snapshot_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "pages": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "order_id": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "refund_id": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "source_revision": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "status": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "amount": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
+                "exponent": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 6
+                },
+                "amount_minor": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]*)$"
+                }
+              },
+              "required": [
+                "currency",
+                "exponent",
+                "amount_minor"
+              ],
+              "additionalProperties": false
+            },
+            "created_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "lines": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "line_id": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "refunded_line_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 256
+                  },
+                  "product_id": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "variation_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 256
+                  },
+                  "sku": {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  "quantity": {
+                    "type": "string",
+                    "pattern": "^-?[0-9]+(\\.[0-9]+)?$"
+                  },
+                  "unit": {
+                    "const": "item"
+                  },
+                  "subtotal": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "total": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "tax": {
+                    "type": "object",
+                    "properties": {
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "exponent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 6
+                      },
+                      "amount_minor": {
+                        "type": "string",
+                        "pattern": "^-?(0|[1-9][0-9]*)$"
+                      }
+                    },
+                    "required": [
+                      "currency",
+                      "exponent",
+                      "amount_minor"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "line_id",
+                  "refunded_line_id",
+                  "product_id",
+                  "variation_id",
+                  "sku",
+                  "quantity",
+                  "unit",
+                  "subtotal",
+                  "total",
+                  "tax"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 100
+            },
+            "allocations_available": {
+              "type": "boolean"
+            },
+            "provider_refund_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "snapshot_id",
+            "page",
+            "pages",
+            "order_id",
+            "refund_id",
+            "source_revision",
+            "status",
+            "amount",
+            "created_at",
+            "lines",
+            "allocations_available",
+            "provider_refund_id"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "wordpress"
+        },
+        "evidence_class": {
+          "const": "source_fact"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "entity_changed"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "id": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "revision": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "path": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "previous_path": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "type",
+            "id",
+            "revision",
+            "path",
+            "previous_path"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "wordpress"
+        },
+        "evidence_class": {
+          "const": "source_fact"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "entity_deleted"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "id": {
+              "type": "string",
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "wordpress"
+        },
+        "evidence_class": {
+          "const": "source_fact"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "health_report"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "plugin_version": {
+              "type": "string",
+              "maxLength": 256
+            },
+            "queue": {
+              "type": "object"
+            },
+            "capabilities": {
+              "type": "object"
+            },
+            "tracking_started_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "plugin_version",
+            "queue",
+            "capabilities",
+            "tracking_started_at"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "wordpress"
+        },
+        "evidence_class": {
+          "const": "source_fact"
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": {
+          "const": "privacy_erasure_requested"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "request_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "order_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 256
+              },
+              "maxItems": 50
+            },
+            "visitor_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "maxItems": 100
+            },
+            "session_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "maxItems": 100
+            },
+            "scope": {
+              "const": "analytics"
+            }
+          },
+          "required": [
+            "request_id",
+            "order_ids",
+            "visitor_ids",
+            "session_ids",
+            "scope"
+          ],
+          "additionalProperties": false
+        },
+        "producer": {
+          "const": "wordpress"
+        },
+        "evidence_class": {
+          "const": "source_fact"
+        }
+      }
+    }
+  ]
+}

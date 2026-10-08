@@ -33,3 +33,9 @@ wp_clear_scheduled_hook( 'magellan_historical_identity_sync' );
 wp_clear_scheduled_hook( 'magellan_daily_cleanup' );
 wp_clear_scheduled_hook( 'magellan_sync_check' );
 wp_clear_scheduled_hook( 'magellan_health_check' );
+
+// Remove credentials on deletion. Preserve v3 outbox evidence for explicit recovery.
+delete_option('magellan_v3_config');
+wp_clear_scheduled_hook('magellan_v3_drain');
+wp_clear_scheduled_hook('magellan_v3_maintenance');
+if (function_exists('as_unschedule_all_actions')) { as_unschedule_all_actions('magellan_v3_drain', [], 'magellan-v3'); }

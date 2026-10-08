@@ -1,41 +1,25 @@
-# MagellanOS Plugins
+# Magellan plugin v3 development candidate
 
-Companion plugins for the MagellanOS Truth Layer — first-party conversion
-verification for e-commerce platforms.
+This branch upgrades the existing `magellan-for-woocommerce` plugin. Magellan retains ownership of stock, canonical orders, payments and finance.
 
-## Plugins
+Read [BUILD-HANDOFF.md](BUILD-HANDOFF.md) for what is implemented, receiver integration, configuration and remaining release gates. The ZIP is an alpha candidate, not an installed or production-certified release.
 
-| Plugin | Platform | Version | Status |
-|---|---|---|---|
-| [magellan-for-woocommerce](./magellan-for-woocommerce/) | WooCommerce (WordPress 6.0+, WC 7.0+) | 2.2.3 | wordpress.org submission-ready |
-| [magellan-staging-installer](./magellan-staging-installer/) | WordPress 6.0+ — **internal staging only** | 1.0.1 | Active (shim until wp.org approves the main plugin) |
+- `magellan-for-woocommerce/`: installable WordPress plugin, preserving the original slug and legacy mode.
+- `contracts/v3/`: JSON Schemas, valid/invalid fixtures and cross-language signature reference.
+- `tests/`: real WordPress/WooCommerce integration tests, isolated browser tests and saved results.
+- `tools/contracts.py`: reproducible schema/signature fixture generation.
 
-## How it fits
+## Validation
 
-These plugins are the **WP/store side** of Truth Layer Track B. They:
+Use a disposable WordPress installation at `http://127.0.0.1:18783` with `WP_ENVIRONMENT_TYPE=local`, WooCommerce, this plugin and a disposable database. The integration test resets this plugin's test outbox and creates synthetic orders, refunds and products. It must never run on a merchant site.
 
-1. Hold an account-scoped HMAC signing secret (issued by MagellanOS)
-2. Hook into platform purchase / cart / identity events
-3. HMAC-sign the payload (`X-Magellan-Signature: t=<unix>,v1=<hex>`) and POST
-   to the MagellanOS `pixel-ingest` Edge Function
-4. Receive verified-attribution and per-event Tracking Health back
+```sh
+php /path/to/wp-cli.phar --path=/path/to/disposable-wordpress eval-file /path/to/this-repository/tests/integration.php
+node tests/contracts.cjs
+python tests/schemas.py
+node tests/browser.cjs
+```
 
-Backend contract is defined in the Truth Layer Backend spec — see
-`/Users/dev/magellan-specs/` and the MagellanOS `supabase/functions/pixel-ingest/`
-implementation.
+Schema tests require `jsonschema==4.25.1`. Browser tests require Playwright; `PLAYWRIGHT_PATH` and `CHROME_EXECUTABLE` can select installed dependencies and a separate browser executable. They use a fresh browser context with intercepted synthetic storefront/collector responses, not the user's browser session.
 
-## Installation
-
-Two paths supported:
-
-- **Auto-install (preferred):** from the MagellanOS Chrome extension's
-  Connect modal → after connecting a WC store via Tier-2 OAuth, the modal
-  offers "Install Magellan Tracking" which kicks off the WP Application
-  Password saga. MagellanOS pushes the plugin into the store via the WP
-  REST API and configures it with the account ID + signing secret.
-- **Manual:** upload the plugin zip via WP admin → Plugins → Add New, then
-  configure account ID + signing secret in Settings → Magellan.
-
-## License
-
-GPL-2.0+
+Run both WooCommerce order-storage modes, synchronizing the disposable WooCommerce tables through its supported HPOS CLI before switching. Saved runtime/result files identify what was actually exercised. Remaining storefront and backend tests are listed in the handoff.

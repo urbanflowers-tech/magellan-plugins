@@ -1,0 +1,86 @@
+{
+  "browser": "155.0.8059.40",
+  "transport": "intercepted collector responses; real isolated Chrome context",
+  "results": [
+    {
+      "test": "unknown consent makes no collector request",
+      "pass": true
+    },
+    {
+      "test": "unknown consent creates no visitor cookie",
+      "pass": true
+    },
+    {
+      "test": "consented page/product/checkout events captured",
+      "pass": true
+    },
+    {
+      "test": "query strings excluded from page identity",
+      "pass": true
+    },
+    {
+      "test": "acknowledged browser queue cleared",
+      "pass": true
+    },
+    {
+      "test": "host-only secure cookie on co.th",
+      "pass": true
+    },
+    {
+      "test": "navigation retains visitor and session",
+      "pass": true
+    },
+    {
+      "test": "entry origin stays frozen, later source retained",
+      "pass": true
+    },
+    {
+      "test": "second tab shares session",
+      "pass": true
+    },
+    {
+      "test": "concurrent tabs retain both unacknowledged events",
+      "pass": true
+    },
+    {
+      "test": "only registered interactions emitted",
+      "pass": true
+    },
+    {
+      "test": "wrong receipt hash retains browser event",
+      "pass": true
+    },
+    {
+      "test": "withdrawal stops collection in the second tab",
+      "pass": true
+    },
+    {
+      "test": "withdrawal clears identifiers and persisted queue",
+      "pass": true
+    },
+    {
+      "test": "new consent does not resurrect erased visitor",
+      "pass": true
+    },
+    {
+      "test": "GPC prevents advertising grant",
+      "pass": true
+    },
+    {
+      "test": "advertising withdrawal removes saved raw click identifiers",
+      "pass": true
+    },
+    {
+      "test": "cleared cookies cannot resurrect the old visitor",
+      "pass": true
+    },
+    {
+      "test": "no browser exceptions",
+      "pass": true
+    },
+    {
+      "test": "blocked storage reports page-local continuity",
+      "pass": true
+    }
+  ]
+}

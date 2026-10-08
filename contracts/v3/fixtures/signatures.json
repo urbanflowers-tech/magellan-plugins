@@ -1,0 +1,38 @@
+[
+  {
+    "method": "POST",
+    "target": "/api/v1/wordpress/events",
+    "installation_id": "install_fixture",
+    "timestamp": 1791428400,
+    "nonce": "11111111-1111-4111-8111-111111111111",
+    "body": "{\"text\":\"ดอกไม้ 🌷\"}",
+    "key_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+    "body_hash": "4700c29148efdff3672385592daa65a2c974737d5dcf8371f50bc050e9a1499c",
+    "canonical": "v3\nPOST\n/api/v1/wordpress/events\ninstall_fixture\n1791428400\n11111111-1111-4111-8111-111111111111\n4700c29148efdff3672385592daa65a2c974737d5dcf8371f50bc050e9a1499c",
+    "signature": "c2e6ca3d3150e84b59e5acf65b71bf9460b760b606a5ecab47ac2700a8baf8bc"
+  },
+  {
+    "method": "GET",
+    "target": "/api/v1/wordpress/receipts?a=1&a=2&cursor=a%20b",
+    "installation_id": "install_fixture",
+    "timestamp": 1791428400,
+    "nonce": "11111111-1111-4111-8111-111111111111",
+    "body": "",
+    "key_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+    "body_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "canonical": "v3\nGET\n/api/v1/wordpress/receipts?a=1&a=2&cursor=a%20b\ninstall_fixture\n1791428400\n11111111-1111-4111-8111-111111111111\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "signature": "6042d8bc9a413157c76b3e07661aeaf6b193ea306c5d99146a817f30286f4952"
+  },
+  {
+    "method": "POST",
+    "target": "/api/v1/wordpress/events",
+    "installation_id": "install_fixture",
+    "timestamp": 1791428400,
+    "nonce": "11111111-1111-4111-8111-111111111111",
+    "body": "{\"a\": 1}",
+    "key_b64": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+    "body_hash": "f9d86028c6e0d64e225186f96acb69338b2c59764df79162107f5c4bb34d1310",
+    "canonical": "v3\nPOST\n/api/v1/wordpress/events\ninstall_fixture\n1791428400\n11111111-1111-4111-8111-111111111111\nf9d86028c6e0d64e225186f96acb69338b2c59764df79162107f5c4bb34d1310",
+    "signature": "ad89a1d7450bb708892b0dff8985116348ef9d414b54849f3602a9b6c4e9f4db"
+  }
+]
