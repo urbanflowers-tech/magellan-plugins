@@ -1,5 +1,5 @@
 {
-  "valid_events": 252,
+  "valid_events": 292,
   "event_types": [
     "cart_converted",
     "cart_emptied",

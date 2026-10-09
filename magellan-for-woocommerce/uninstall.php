@@ -38,4 +38,12 @@ wp_clear_scheduled_hook( 'magellan_health_check' );
 delete_option('magellan_v3_config');
 wp_clear_scheduled_hook('magellan_v3_drain');
 wp_clear_scheduled_hook('magellan_v3_maintenance');
-if (function_exists('as_unschedule_all_actions')) { as_unschedule_all_actions('magellan_v3_drain', [], 'magellan-v3'); }
+if (function_exists('as_unschedule_all_actions')) { foreach (['magellan_v3_drain','magellan_v3_maintenance','magellan_v3_reconcile'] as $hook) { as_unschedule_all_actions($hook, [], 'magellan-v3'); } }
+
+wp_clear_scheduled_hook('magellan_v3_reconcile');
+if (get_option('magellan_v3_uninstall_data', 'retain') === 'delete') {
+    global $wpdb;
+    foreach (['magellan_v3_outbox','magellan_v3_quota','magellan_v3_recovery'] as $suffix) { $wpdb->query('DROP TABLE IF EXISTS `' . $wpdb->prefix . $suffix . '`'); }
+    $keys = $wpdb->get_col($wpdb->prepare("SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s", $wpdb->esc_like('magellan_v3_') . '%'));
+    foreach ($keys as $key) { delete_option($key); }
+}

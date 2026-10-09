@@ -1,0 +1,26 @@
+{
+  "backend_commit": "4cfc67eaf936e8d25b825dce36aeff789c127aaa",
+  "scope": "Actual paired receiver validation and parser, no database/network/deployment",
+  "events": 292,
+  "event_types": [
+    "cart_converted",
+    "cart_emptied",
+    "cart_snapshot",
+    "checkout_stage_observed",
+    "checkout_started",
+    "consent_changed",
+    "entity_changed",
+    "entity_deleted",
+    "interaction_observed",
+    "order_snapshot",
+    "order_status_changed",
+    "page_viewed",
+    "payment_fact",
+    "privacy_erasure_requested",
+    "product_viewed",
+    "refund_recorded"
+  ],
+  "php_hashes": 193,
+  "errors": [],
+  "pass": true
+}

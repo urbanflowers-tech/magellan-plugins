@@ -3,7 +3,7 @@
  * Plugin Name:       Magellan for WooCommerce
  * Plugin URI:        https://magellan.app
  * Description:       Consent-controlled website measurement and durable WooCommerce evidence delivery to Magellan.
- * Version:           3.0.0-alpha.4
+ * Version:           3.0.0-alpha.5
  * Author:            Magellan
  * Author URI:        https://magellan.app
  * License:           GPL-2.0+
@@ -12,7 +12,7 @@
  * Requires PHP:      8.0
  * Text Domain:       magellan-for-woocommerce
  * Domain Path:       /languages
- * WC requires at least: 7.0
+ * WC requires at least: 9.9
  * WC tested up to:   11.2.0
  *
  * @package Magellan
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Constants
 // ---------------------------------------------------------------------
 
-define( 'MAGELLAN_VERSION',            '3.0.0-alpha.4' );
+define( 'MAGELLAN_VERSION',            '3.0.0-alpha.5' );
 define( 'MAGELLAN_PLUGIN_FILE',        __FILE__ );
 define( 'MAGELLAN_PLUGIN_DIR',         plugin_dir_path( __FILE__ ) );
 define( 'MAGELLAN_PLUGIN_URL',         plugin_dir_url( __FILE__ ) );
@@ -153,31 +153,16 @@ add_action(
 // Activation — schedule historical identity sync
 // ---------------------------------------------------------------------
 
-register_activation_hook(
-	__FILE__,
-	function () {
-		// Run the historical sync 60 seconds after activation so
-		// the rest of the plugin has time to register hooks.
-		if ( ! wp_next_scheduled( 'magellan_historical_identity_sync' ) ) {
-			wp_schedule_single_event( time() + 60, 'magellan_historical_identity_sync' );
-		}
-
-		// Daily housekeeping
-		if ( ! wp_next_scheduled( 'magellan_daily_cleanup' ) ) {
-			wp_schedule_event( strtotime( 'tomorrow 03:00' ), 'daily', 'magellan_daily_cleanup' );
-		}
-
-		// Webhook reliability backup — every 5 minutes
-		if ( ! wp_next_scheduled( 'magellan_sync_check' ) ) {
-			wp_schedule_event( time() + 300, 'magellan_5min', 'magellan_sync_check' );
-		}
-
-		// Daily health report
-		if ( ! wp_next_scheduled( 'magellan_health_check' ) ) {
-			wp_schedule_event( strtotime( 'tomorrow 03:05' ), 'daily', 'magellan_health_check' );
-		}
-	}
-);
+function magellan_schedule_legacy_jobs(): void {
+    $v3 = (array) get_option('magellan_v3_config', []);
+    if (!empty($v3['connected_at']) && ($v3['collection_mode'] ?? 'full') !== 'measurement_only') { return; }
+    if (!wp_next_scheduled('magellan_historical_identity_sync')) { wp_schedule_single_event(time() + 60, 'magellan_historical_identity_sync'); }
+    if (!wp_next_scheduled('magellan_sync_check')) { wp_schedule_event(time() + 300, 'magellan_5min', 'magellan_sync_check'); }
+    if (!wp_next_scheduled('magellan_health_check')) { wp_schedule_event(time() + 300, 'daily', 'magellan_health_check'); }
+    // The old cleanup hook had no handler.
+    wp_clear_scheduled_hook('magellan_daily_cleanup');
+}
+register_activation_hook(__FILE__, 'magellan_schedule_legacy_jobs');
 
 // Custom 5-minute cron schedule
 add_filter(
@@ -206,7 +191,8 @@ register_deactivation_hook(
 		wp_clear_scheduled_hook( 'magellan_health_check' );
 		wp_clear_scheduled_hook( 'magellan_v3_drain' );
 		wp_clear_scheduled_hook( 'magellan_v3_maintenance' );
-		if ( function_exists('as_unschedule_all_actions') ) { as_unschedule_all_actions('magellan_v3_drain', [], 'magellan-v3'); }
+		wp_clear_scheduled_hook( 'magellan_v3_reconcile' );
+		if ( function_exists('as_unschedule_all_actions') ) { foreach (['magellan_v3_drain','magellan_v3_maintenance','magellan_v3_reconcile'] as $hook) { as_unschedule_all_actions($hook, [], 'magellan-v3'); } }
 	}
 );
 

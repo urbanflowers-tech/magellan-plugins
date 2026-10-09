@@ -19,8 +19,28 @@ final class Admin {
         if (defined('WP_CLI') && WP_CLI) {
             \WP_CLI::add_command('magellan drain', static function () { Outbox::drain(); \WP_CLI::success('Bounded drain completed; inspect magellan status for receipts.'); });
             \WP_CLI::add_command('magellan status', static function () { \WP_CLI::line(Protocol::json(self::status())); });
-            \WP_CLI::add_command('magellan reconcile', static function () { Capture::reconcile(); \WP_CLI::success('One bounded reconciliation page completed.'); });
+            \WP_CLI::add_command('magellan reconcile', static function () { Capture::reconcile(); \WP_CLI::success('Bounded reconciliation completed; inspect recovery failures and continuation status.'); });
             \WP_CLI::add_command('magellan maintenance', static function () { Outbox::maintenance(); \WP_CLI::success('Bounded maintenance completed.'); });
+            \WP_CLI::add_command('magellan queue export', static function ($args, $options) {
+                global $wpdb; $after = max(0, (int) ($options['after'] ?? 0));
+                $rows = $wpdb->get_results($wpdb->prepare('SELECT * FROM ' . Outbox::table() . ' WHERE seq>%d ORDER BY seq LIMIT 500', $after), ARRAY_A);
+                foreach ($rows as $row) { \WP_CLI::line(Protocol::json($row)); }
+            });
+            \WP_CLI::add_command('magellan queue discard', static function ($args, $options) {
+                global $wpdb; $id = Protocol::id($options['event-id'] ?? null);
+                if (!$id || ($options['confirm-discard'] ?? '') !== $id) { \WP_CLI::error('Export first. Supply --event-id=UUID --confirm-discard=UUID to discard exactly that unresolved event.'); }
+                $row = $wpdb->get_row($wpdb->prepare('SELECT * FROM ' . Outbox::table() . " WHERE event_id=%s AND state IN ('blocked','dead_letter') AND last_error<>'privacy_erasure_pending'", $id), ARRAY_A);
+                if (!$row || !Outbox::remove_row($row)) { \WP_CLI::error('No discardable event found; active and privacy-held events cannot be discarded here.'); }
+                Outbox::gap('operator_discarded_event');
+                \WP_CLI::success('Discarded event ' . $id . '. The capture gap remains visible for review.');
+            });
+            \WP_CLI::add_command('magellan acknowledge-gap', static function ($args, $options) {
+                $gap = get_option('magellan_v3_capture_gap');
+                if (!$gap || ($options['gap-id'] ?? '') !== $gap['id'] || empty($options['note']) || Recovery::stats()['failed_orders'] > 0) { \WP_CLI::error('Resolve failed source captures first, then supply the current --gap-id and a --note documenting the review.'); }
+                update_option('magellan_v3_last_gap_review', ['gap' => $gap, 'reviewed_at' => gmdate('c'), 'note' => substr(sanitize_text_field($options['note']), 0, 500)], false);
+                delete_option('magellan_v3_capture_gap');
+                \WP_CLI::success('Gap acknowledged. This records a review, not proof that lost browser/cart observations were recovered.');
+            });
         }
     }
     public static function permission(): bool { return current_user_can('manage_options'); }
@@ -52,6 +72,8 @@ final class Admin {
             $p = is_string($raw) && strlen($raw) <= 16384 ? json_decode(wp_unslash($raw), true) : null;
             $result = is_array($p) ? Config::configure($p) : new \WP_Error('bad_json','Invalid configuration JSON.');
             set_transient('magellan_v3_notice_' . get_current_user_id(), is_wp_error($result) ? $result->get_error_message() : 'Connection verified. Purge the page cache before testing the new pixel.', 60);
+        } elseif (isset($_POST['uninstall_data'])) {
+            update_option('magellan_v3_uninstall_data', $_POST['uninstall_data'] === 'delete' ? 'delete' : 'retain', false);
         } elseif (isset($_POST['analytics'])) {
             $c = Config::get(); $c['analytics_enabled'] = $_POST['analytics'] === 'enable'; update_option(Config::OPTION, $c, false);
             set_transient('magellan_v3_notice_' . get_current_user_id(), 'Analytics setting saved. Purge the page cache to apply it to cached pages.', 60);
@@ -70,6 +92,8 @@ final class Admin {
             echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="magellan_v3_settings">'; wp_nonce_field('magellan_v3_settings');
             echo '<input type="hidden" name="analytics" value="' . (Config::analytics() ? 'disable' : 'enable') . '">'; submit_button(Config::analytics() ? 'Disable browser analytics' : 'Enable consent-controlled analytics', 'secondary'); echo '</form>';
         }
+        echo '<h2>Data on plugin deletion</h2><p>Retain the local event queue for recovery, or delete the local v3 queue and diagnostics when this plugin is uninstalled. WooCommerce orders and Magellan records are unaffected. Order attribution metadata remains in WooCommerce.</p><form method="post" action="' . esc_url(admin_url('admin-post.php')) . '"><input type="hidden" name="action" value="magellan_v3_settings">'; wp_nonce_field('magellan_v3_settings');
+        echo '<select name="uninstall_data"><option value="retain">Retain for recovery (default)</option><option value="delete" ' . selected(get_option('magellan_v3_uninstall_data'), 'delete', false) . '>Delete local v3 queue and diagnostics on uninstall</option></select>'; submit_button('Save deletion preference', 'secondary'); echo '</form>';
         echo '<p>For low-traffic stores, run <code>wp magellan drain</code> from real cron. Scheduling alone does not prove the runner is executing.</p></div>';
     }
     public static function classification($value): string { return in_array($value, ['home','content','product','category','commercial_landing','utility','unknown'], true) ? $value : ''; }

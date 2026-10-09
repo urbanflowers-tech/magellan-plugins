@@ -8,11 +8,19 @@
       "pass": true
     },
     {
+      "test": "unknown consent creates no legacy identifiers",
+      "pass": true
+    },
+    {
       "test": "unknown consent creates no visitor cookie",
       "pass": true
     },
     {
       "test": "consented page/product/checkout events captured",
+      "pass": true
+    },
+    {
+      "test": "deferred legacy pixel inherits current v3 consent",
       "pass": true
     },
     {
@@ -56,11 +64,11 @@
       "pass": true
     },
     {
-      "test": "v3 withdrawal preserves the existing legacy cart cookie",
+      "test": "legacy pixel uses host-only identity cookie on co.th",
       "pass": true
     },
     {
-      "test": "v3 withdrawal preserves the legacy in-page identity",
+      "test": "withdrawal removes both legacy identifiers",
       "pass": true
     },
     {
@@ -109,6 +117,10 @@
     },
     {
       "test": "null entries recover in a real browser",
+      "pass": true
+    },
+    {
+      "test": "large paid landing survives in real Chrome within event budget",
       "pass": true
     },
     {

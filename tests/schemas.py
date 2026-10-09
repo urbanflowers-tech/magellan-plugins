@@ -10,6 +10,10 @@ if (r/'tests/custom-checkout-events.json').exists():
     events+=json.loads((r/'tests/custom-checkout-events.json').read_text())
 if (r/'tests/pilot-browser-events.json').exists():
     events+=json.loads((r/'tests/pilot-browser-events.json').read_text())
+if (r/'tests/review-events.json').exists():
+    events+=json.loads((r/'tests/review-events.json').read_text())
+if (r/'tests/large-landing-events.json').exists():
+    events+=json.loads((r/'tests/large-landing-events.json').read_text())
 by_type={}
 for event in events:
     validator.validate(event);by_type.setdefault(event['event_type'],event)

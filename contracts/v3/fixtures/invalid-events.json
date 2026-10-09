@@ -1,18 +1,18 @@
 [
   {
     "schema_version": "3.0.0",
-    "plugin_version": "3.0.0-alpha.3",
-    "event_id": "a806fbef-6349-4c44-b4ce-3218e7df02b8",
+    "plugin_version": "3.0.0-alpha.5",
+    "event_id": "d04b82d1-6433-433d-a551-1a175acb99f3",
     "event_type": "order_snapshot",
     "site_id": "site_fixture",
     "installation_id": "install_fixture",
     "environment": "test",
     "producer": "browser",
     "evidence_class": "observation",
-    "occurred_at": "2026-10-09T02:28:45.115Z",
-    "captured_at": "2026-10-09T02:28:45.115Z",
-    "visitor_id": "71015ebd-19af-469f-bc1f-236a2fc14094",
-    "session_id": "1faa19f9-0550-4d63-9ed8-8a9d478f922b",
+    "occurred_at": "2026-10-09T07:47:48.497Z",
+    "captured_at": "2026-10-09T07:47:48.497Z",
+    "visitor_id": "5a988c2e-25ba-4269-9aaf-9ec246575c84",
+    "session_id": "4162b45d-d603-46b3-b95d-5e8e5321e21d",
     "cart_id": null,
     "entity": null,
     "origin_system": "browser",
@@ -21,9 +21,9 @@
     "sequence": 1,
     "consent": {
       "source": "test_cmp",
-      "effective_at": "2026-10-09T02:28:45.107Z",
+      "effective_at": "2026-10-09T07:47:48.491Z",
       "policy_version": "1",
-      "epoch": 1791512925107,
+      "epoch": 1791532068491,
       "gpc": false,
       "analytics": "granted",
       "advertising": "granted",
@@ -36,18 +36,18 @@
   },
   {
     "schema_version": "3.0.0",
-    "plugin_version": "3.0.0-alpha.3",
-    "event_id": "a806fbef-6349-4c44-b4ce-3218e7df02b8",
+    "plugin_version": "3.0.0-alpha.5",
+    "event_id": "d04b82d1-6433-433d-a551-1a175acb99f3",
     "event_type": "page_viewed",
     "site_id": "site_fixture",
     "installation_id": "install_fixture",
     "environment": "test",
     "producer": "browser",
     "evidence_class": "observation",
-    "occurred_at": "2026-10-09T02:28:45.115Z",
-    "captured_at": "2026-10-09T02:28:45.115Z",
-    "visitor_id": "71015ebd-19af-469f-bc1f-236a2fc14094",
-    "session_id": "1faa19f9-0550-4d63-9ed8-8a9d478f922b",
+    "occurred_at": "2026-10-09T07:47:48.497Z",
+    "captured_at": "2026-10-09T07:47:48.497Z",
+    "visitor_id": "5a988c2e-25ba-4269-9aaf-9ec246575c84",
+    "session_id": "4162b45d-d603-46b3-b95d-5e8e5321e21d",
     "cart_id": null,
     "entity": null,
     "origin_system": "browser",
@@ -56,9 +56,9 @@
     "sequence": 1,
     "consent": {
       "source": "test_cmp",
-      "effective_at": "2026-10-09T02:28:45.107Z",
+      "effective_at": "2026-10-09T07:47:48.491Z",
       "policy_version": "1",
-      "epoch": 1791512925107,
+      "epoch": 1791532068491,
       "gpc": false,
       "analytics": "granted",
       "advertising": "granted",
@@ -66,7 +66,7 @@
       "sms_marketing": "denied"
     },
     "payload": {
-      "navigation_id": "a51b6a66-1bc6-4bc8-b138-e809a99351c7",
+      "navigation_id": "ef860e50-15fc-4062-8cb0-dfb56a8ab340",
       "path": "/flowers/",
       "page_id": "42",
       "entry_type": "product",
@@ -106,54 +106,54 @@
         }
       },
       "continuity": "shared",
-      "session_started_at": "2026-10-09T02:28:45.113Z",
+      "session_started_at": "2026-10-09T07:47:48.495Z",
       "session_aliases": [],
-      "stream_id": "621fb958-22a7-491b-a5f9-5d9443ea0f38"
+      "stream_id": "3e205e7c-dd78-4525-8581-8675993daced"
     },
     "unexpected": "not allowed"
   },
   {
     "schema_version": "3.0.0",
-    "plugin_version": "3.0.0-alpha.4",
-    "event_id": "4d8c78db-3f39-4697-9985-35ed56e156cd",
+    "plugin_version": "3.0.0-alpha.5",
+    "event_id": "77925a83-3acc-421f-92da-76b2346357c0",
     "event_type": "order_snapshot",
     "site_id": "site_fixture",
     "installation_id": "install_fixture",
     "environment": "test",
     "producer": "wordpress",
     "evidence_class": "source_fact",
-    "occurred_at": "2026-10-09T03:56:48+00:00",
-    "captured_at": "2026-10-09T03:56:48+00:00",
-    "visitor_id": "fa6fda07-cf6e-4160-9a3c-7e0feafededd",
-    "session_id": "e085f61b-71b2-455b-9f94-2e12ee530fcd",
-    "cart_id": "432b87d3-9af7-4f6e-bd6c-aa6e1d551539",
+    "occurred_at": "2026-10-09T07:44:32+00:00",
+    "captured_at": "2026-10-09T07:44:33+00:00",
+    "visitor_id": null,
+    "session_id": null,
+    "cart_id": null,
     "entity": {
       "source_system": "woocommerce",
       "type": "order",
-      "id": "154",
-      "revision": "e0808720ece360a861b21bac0098420990417d3cc18ca7c85d9aff09f6c14169"
+      "id": "11",
+      "revision": "f1cdaaeb8d6c9e9144bf2fb225b973ba56e599d81c57ad7201c03e18ea1dba16"
     },
     "origin_system": "woocommerce",
     "operation_id": null,
     "causation_id": null,
-    "sequence": 1,
+    "sequence": 14,
     "consent": {
-      "analytics": "granted",
+      "analytics": "unknown",
       "advertising": "unknown",
       "email_marketing": "unknown",
       "sms_marketing": "unknown",
-      "source": "browser_asserted:fixture",
-      "effective_at": "2026-10-09T03:56:48+00:00",
+      "source": "unavailable",
+      "effective_at": "2026-10-09T07:44:33+00:00",
       "policy_version": "unknown",
       "epoch": 0,
       "gpc": false
     },
     "payload": {
       "source_system": "woocommerce",
-      "order_id": "154",
+      "order_id": "11",
       "status": "pending",
-      "created_at": "2026-10-09T03:56:48+00:00",
-      "modified_at": "2026-10-09T03:56:48+00:00",
+      "created_at": "2026-10-08T09:41:41+00:00",
+      "modified_at": "2026-10-09T07:44:32+00:00",
       "currency": "THB",
       "exponent": 2,
       "amounts": {
@@ -185,9 +185,9 @@
       },
       "lines": [
         {
-          "line_id": "575",
+          "line_id": "1",
           "refunded_line_id": null,
-          "product_id": "153",
+          "product_id": "10",
           "variation_id": null,
           "sku": "",
           "quantity": "2",
@@ -214,42 +214,14 @@
       "payment_method": "bacs",
       "transaction_id": null,
       "paid_at": null,
-      "checkout_context": {
-        "visitor_id": "fa6fda07-cf6e-4160-9a3c-7e0feafededd",
-        "session_id": "e085f61b-71b2-455b-9f94-2e12ee530fcd",
-        "cart_id": "432b87d3-9af7-4f6e-bd6c-aa6e1d551539",
-        "consent": {
-          "analytics": "granted",
-          "advertising": "unknown",
-          "email_marketing": "unknown",
-          "sms_marketing": "unknown",
-          "source": "browser_asserted:fixture",
-          "effective_at": "2026-10-09T03:56:48+00:00",
-          "policy_version": "unknown",
-          "epoch": 0,
-          "gpc": false
-        },
-        "link_provenance": "browser_asserted_checkout_cookie",
-        "checkout_attempt_id": null,
-        "entry": {
-          "path": "/flowers/",
-          "source_evidence": {
-            "utm": {
-              "source": "google"
-            },
-            "click_ids": [],
-            "click_id_types": [],
-            "referrer_domain": "www.google.com"
-          }
-        }
-      },
+      "checkout_context": {},
       "native_attribution": {},
       "channel_origin": "web_checkout",
       "subscriptions": {
         "adapter": "unavailable"
       },
-      "source_revision": "e0808720ece360a861b21bac0098420990417d3cc18ca7c85d9aff09f6c14169",
-      "snapshot_id": "0c25aae8-eed7-4d19-a1a4-eb519680334a",
+      "source_revision": "f1cdaaeb8d6c9e9144bf2fb225b973ba56e599d81c57ad7201c03e18ea1dba16",
+      "snapshot_id": "b8dca35e-72e6-4aa7-aeee-075c9b418d52",
       "pages": 1,
       "page": 1
     }

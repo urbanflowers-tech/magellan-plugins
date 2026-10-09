@@ -1,0 +1,46 @@
+{
+    "runtime": {
+        "wordpress": "6.9.4",
+        "woocommerce": "9.9.5",
+        "hpos": false
+    },
+    "scope": "Real WP\/Woo\/Action Scheduler with synthetic challenge; follow with fresh-process boot assertion",
+    "results": [
+        {
+            "test": "unrecognized pilot mode rejected",
+            "pass": true
+        },
+        {
+            "test": "old receiver cannot accidentally activate measurement mode",
+            "pass": true
+        },
+        {
+            "test": "receiver mode mismatch leaves prior connection unchanged",
+            "pass": true
+        },
+        {
+            "test": "explicit matching mode connects",
+            "pass": true
+        },
+        {
+            "test": "pilot retains legacy boot path",
+            "pass": true
+        },
+        {
+            "test": "pilot preserves legacy scheduled health",
+            "pass": true
+        },
+        {
+            "test": "pilot preserves queued legacy order dispatch",
+            "pass": true
+        },
+        {
+            "test": "pilot preserves legacy connection settings",
+            "pass": true
+        },
+        {
+            "test": "status distinguishes measurement and legacy coexistence",
+            "pass": true
+        }
+    ]
+}

@@ -2,6 +2,8 @@
 /** Run only against a disposable WordPress/WooCommerce database with WP-CLI eval-file. */
 use Magellan\V3\{Protocol,Config,Outbox,Capture,Admin,Privacy};
 if (!defined('WP_CLI') || !WP_CLI || wp_get_environment_type() !== 'local' || !str_contains(home_url(),'127.0.0.1:18783')) { throw new RuntimeException('Disposable local fixture required'); }
+add_filter('pre_wp_mail', static fn()=>true);
+add_filter('pre_http_request', static fn($pre,$args,$url)=>str_starts_with($url,'https://example.com/magellan/') ? $pre : new WP_Error('fixture_network_disabled','No real network in this fixture'), 999, 3);
 global $results; $results = [];
 function check($name, $ok) { global $results; $results[]=['test'=>$name,'pass'=>(bool)$ok]; if (!$ok) { throw new RuntimeException('FAILED: '.$name); } }
 global $wpdb;
@@ -18,7 +20,7 @@ add_filter('pre_http_request', function ($pre,$args,$url) use (&$mode,&$requests
     $code=$mode==='failure' ? 503 : ($mode==='auth' ? 401 : ($mode==='in_progress'||$mode==='conflict' ? 409 : 202)); $receipts=[];
     foreach (($data['events'] ?? []) as $index=>$event) {
         if ($mode==='failure'||$mode==='auth'||$mode==='in_progress'||($mode==='mixed'&&$index>0)) { continue; }
-        if ($mode==='privacy_race' && $event['event_id']===$race_id) { global $wpdb; $wpdb->update(Outbox::table(),['state'=>'blocked','last_error'=>'privacy_erasure_pending'],['event_id'=>$race_id]); }
+        if ($mode==='privacy_race' && $event['event_id']===$race_id) { global $wpdb; $wpdb->update(Outbox::table(),['state'=>'blocked','last_error'=>'privacy_erasure_pending','lease_token'=>''],['event_id'=>$race_id]); }
         $receipts[]=['event_id'=>$event['event_id'],'body_hash'=>$mode==='wrong_hash' ? str_repeat('0',64) : hash('sha256',Protocol::json($wire->events[$index])), 'status'=>$mode==='conflict' ? 'payload_conflict' : ($mode==='duplicate' ? 'duplicate' : 'accepted'), 'receipt_id'=>'receipt_'.$event['event_id'],'received_at'=>gmdate('c'),'code'=>null];
     }
     return ['response'=>['code'=>$code], 'headers'=>[], 'body'=>Protocol::json(['results'=>$receipts])];
@@ -36,7 +38,7 @@ foreach ($vectors as $i=>$v) {
 }
 check('query pairs preserve duplicate keys',Protocol::target('https://example.com/a?cursor=a%20b&a=2&a=1')==='/a?a=1&a=2&cursor=a%20b');
 foreach ([['1500.00','THB',2,'150000'],['123','JPY',0,'123'],['-1.234','KWD',3,'-1234'],['9007199254740993.00','USD',2,'900719925474099300']] as $v) { check('exact '.$v[1].' '.$v[0],Protocol::money($v[0],$v[1],$v[2])['amount_minor']===$v[3]); }
-try { Protocol::money('1.001','THB',2); check('reject precision ambiguity',false); } catch (InvalidArgumentException $e) { check('reject precision ambiguity',true); }
+check('round WooCommerce sub-minor precision half up', Protocol::money('934.579439','THB',2)['amount_minor']==='93458' && Protocol::money('-0.005','THB',2)['amount_minor']==='-1');
 $visitor=wp_generate_uuid4(); $session=wp_generate_uuid4();
 $_COOKIE['_mgln_v3_context_site_fixture']=wp_slash(Protocol::json(['site_id'=>'site_fixture','visitor_id'=>$visitor,'session_id'=>$session,'updated_at'=>time(),'consent'=>array_merge(Protocol::consent(),['analytics'=>'granted','source'=>'fixture']), 'entry'=>['path'=>'/flowers/?token=private','source_evidence'=>['utm'=>['source'=>'google'],'click_ids'=>[],'referrer_domain'=>'www.google.com']]]));
 $product=new WC_Product_Simple(); $product->set_name('Fixture flower'); $product->set_regular_price('100.00'); $product->save();

@@ -1,0 +1,216 @@
+{
+    "runtime": {
+        "wordpress": "6.9.4",
+        "woocommerce": "9.9.5",
+        "php": "8.2.29",
+        "mysql": "8.4.0",
+        "hpos": true
+    },
+    "transport": "mock responses; real WP\/Woo\/MySQL storage and hooks",
+    "results": [
+        {
+            "test": "reject short signing key",
+            "pass": true
+        },
+        {
+            "test": "reject local destination",
+            "pass": true
+        },
+        {
+            "test": "reject clone origin",
+            "pass": true
+        },
+        {
+            "test": "signed challenge before connected",
+            "pass": true
+        },
+        {
+            "test": "signature vector 0",
+            "pass": true
+        },
+        {
+            "test": "signature vector 1",
+            "pass": true
+        },
+        {
+            "test": "signature vector 2",
+            "pass": true
+        },
+        {
+            "test": "query pairs preserve duplicate keys",
+            "pass": true
+        },
+        {
+            "test": "exact THB 1500.00",
+            "pass": true
+        },
+        {
+            "test": "exact JPY 123",
+            "pass": true
+        },
+        {
+            "test": "exact KWD -1.234",
+            "pass": true
+        },
+        {
+            "test": "exact USD 9007199254740993.00",
+            "pass": true
+        },
+        {
+            "test": "round WooCommerce sub-minor precision half up",
+            "pass": true
+        },
+        {
+            "test": "real WooCommerce order captured once",
+            "pass": true
+        },
+        {
+            "test": "exact observed total and line IDs",
+            "pass": true
+        },
+        {
+            "test": "checkout context frozen on order",
+            "pass": true
+        },
+        {
+            "test": "unchanged source revision deduplicated",
+            "pass": true
+        },
+        {
+            "test": "real Woo refund created",
+            "pass": true
+        },
+        {
+            "test": "refund exists before first purchase receipt",
+            "pass": true
+        },
+        {
+            "test": "refund keeps saved session after browser leaves",
+            "pass": true
+        },
+        {
+            "test": "cancellation captured independently",
+            "pass": true
+        },
+        {
+            "test": "503 retained for explicit retry",
+            "pass": true
+        },
+        {
+            "test": "retry keeps exact immutable bytes",
+            "pass": true
+        },
+        {
+            "test": "409 in progress is not accepted",
+            "pass": true
+        },
+        {
+            "test": "acknowledgement requires matching body hash",
+            "pass": true
+        },
+        {
+            "test": "mixed receipt accepts only named event",
+            "pass": true
+        },
+        {
+            "test": "completed duplicate receipts settle remaining queue",
+            "pass": true
+        },
+        {
+            "test": "payload conflict quarantined",
+            "pass": true
+        },
+        {
+            "test": "auth failure pauses installation",
+            "pass": true
+        },
+        {
+            "test": "capture continues without auth hammering",
+            "pass": true
+        },
+        {
+            "test": "rebind with unresolved events rejected",
+            "pass": true
+        },
+        {
+            "test": "key rotation resumes blocked delivery",
+            "pass": true
+        },
+        {
+            "test": "status never exposes key",
+            "pass": true
+        },
+        {
+            "test": "optional site reading is explicitly disabled",
+            "pass": true
+        },
+        {
+            "test": "cloned site fails closed",
+            "pass": true
+        },
+        {
+            "test": "WordPress privacy export finds links",
+            "pass": true
+        },
+        {
+            "test": "erasure queued without deleting canonical finance",
+            "pass": true
+        },
+        {
+            "test": "local analytics link removed",
+            "pass": true
+        },
+        {
+            "test": "cart snapshot reads real WooCommerce basket",
+            "pass": true
+        },
+        {
+            "test": "last item removal emits explicit empty cart",
+            "pass": true
+        },
+        {
+            "test": "new basket has independent lifecycle",
+            "pass": true
+        },
+        {
+            "test": "Blocks hook stamps server-bound cart",
+            "pass": true
+        },
+        {
+            "test": "payment callback is labeled channel evidence",
+            "pass": true
+        },
+        {
+            "test": "large order snapshot paginated without duplicated lines",
+            "pass": true
+        },
+        {
+            "test": "late receipt cannot release a concurrent privacy hold",
+            "pass": true
+        },
+        {
+            "test": "capacity saturation preserves existing queue",
+            "pass": true
+        },
+        {
+            "test": "expired worker lease recovered",
+            "pass": true
+        },
+        {
+            "test": "bounded cleanup prunes only accepted events",
+            "pass": true
+        },
+        {
+            "test": "failed drain schedules its successor after AS completion",
+            "pass": true
+        },
+        {
+            "test": "anonymous configuration denied",
+            "pass": true
+        },
+        {
+            "test": "authorized administrator can inspect diagnostics",
+            "pass": true
+        }
+    ]
+}

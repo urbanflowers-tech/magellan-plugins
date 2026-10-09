@@ -54,7 +54,7 @@ class Magellan_Sender {
 		}
 
 		// Deduplicate — never schedule twice for the same order
-		if ( $order->get_meta( '_mgln_event_scheduled' ) ) {
+		if ( $order->get_meta( '_mgln_event_sent' ) || (function_exists('as_has_scheduled_action') && as_has_scheduled_action('magellan_send_verified_event', [(int) $order_id], 'magellan')) || wp_next_scheduled('magellan_send_verified_event', [(int) $order_id]) ) {
 			return;
 		}
 
@@ -99,7 +99,7 @@ class Magellan_Sender {
 
 	private static function schedule_action( string $hook, array $args, int $delay ): void {
 		if ( function_exists( 'as_schedule_single_action' ) ) {
-			as_schedule_single_action( time() + $delay, $hook, $args, 'magellan' );
+			as_schedule_single_action( time() + $delay, $hook, $args, 'magellan', true );
 		} else {
 			wp_schedule_single_event( time() + $delay, $hook, $args );
 		}
@@ -194,7 +194,7 @@ class Magellan_Sender {
 			'context' => [
 				'user_agent'    => $order->get_customer_user_agent() ?: null,
 				'ip_address'    => $order->get_customer_ip_address() ?: null,
-				'consent_state' => apply_filters( 'magellan_consent_state', 'granted', $order ),
+				'consent_state' => apply_filters( 'magellan_consent_state', Magellan_Tracker::consent_state($order), $order ),
 			],
 		];
 
@@ -249,7 +249,7 @@ class Magellan_Sender {
 			],
 
 			'context' => [
-				'consent_state' => apply_filters( 'magellan_consent_state', 'granted', $order ),
+				'consent_state' => apply_filters( 'magellan_consent_state', Magellan_Tracker::consent_state($order), $order ),
 			],
 		];
 
@@ -303,10 +303,9 @@ class Magellan_Sender {
 	// Identity batch sender — called from Magellan_Identity::run_historical_sync
 	// ----------------------------------------------------------------
 
-	public static function send_identity_batch( array $identities, string $sync_run_id, int $batch_num, int $batch_total, bool $is_final ): void {
-		if ( empty( $identities ) || ! Magellan_Admin::is_configured() ) {
-			return;
-		}
+	public static function send_identity_batch( array $identities, string $sync_run_id, int $batch_num, int $batch_total, bool $is_final ): bool {
+		if (!Magellan_Admin::is_configured()) { return false; }
+        if (empty($identities)) { return true; }
 
 		$payload = [
 			'batch_id'      => sprintf( 'batch_%03d_of_%03d', $batch_num, max( $batch_total, 1 ) ),
@@ -317,7 +316,7 @@ class Magellan_Sender {
 			'is_final_batch' => $is_final,
 		];
 
-		self::dispatch_signed( MAGELLAN_ENDPOINT_IDENTS, $payload );
+		return self::dispatch_signed( MAGELLAN_ENDPOINT_IDENTS, $payload );
 	}
 
 	// ----------------------------------------------------------------
@@ -397,7 +396,9 @@ class Magellan_Sender {
 		$signed    = $timestamp . '.' . $body;
 		$signature = hash_hmac( 'sha256', $signed, $signing_bytes );
 
-		$response = wp_remote_post( $endpoint, [
+		if (!\Magellan\V3\Config::endpoint($endpoint)) { Magellan_Admin::record_error('Invalid API endpoint: HTTPS with no redirect is required.'); return false; }
+		$response = wp_safe_remote_post( $endpoint, [
+			'redirection' => 0,
 			'body'      => $body,
 			'headers'   => [
 				'Content-Type'              => 'application/json',

@@ -1,0 +1,52 @@
+{
+    "runtime": {
+        "wordpress": "7.1.3",
+        "woocommerce": "11.2.0",
+        "php": "8.2.29",
+        "hpos": true
+    },
+    "merchant_source_sha256": "4acd0503503c2bf58d6b4b4bd1049d343ddf98cd97c71d27ac964bb839442af2",
+    "scope": "Actual merchant order handler in isolated WordPress; simulated provider object; HTTP and mail disabled; no gateway transaction",
+    "results": [
+        {
+            "test": "actual merchant express handler creates a local fixture order",
+            "pass": true
+        },
+        {
+            "test": "express order freezes the consented checkout session",
+            "pass": true
+        },
+        {
+            "test": "express order links the server-owned basket",
+            "pass": true
+        },
+        {
+            "test": "express snapshot retains source and observed total",
+            "pass": true
+        },
+        {
+            "test": "express order is labeled web checkout",
+            "pass": true
+        },
+        {
+            "test": "repeated checkout processing neither duplicates conversion nor changes source",
+            "pass": true
+        },
+        {
+            "test": "later express refund retains the saved session without a browser",
+            "pass": true
+        },
+        {
+            "test": "standard checkout remains a single conversion when both hooks fire",
+            "pass": true
+        },
+        {
+            "test": "administrative order is not stamped from the current browser cookie",
+            "pass": true
+        },
+        {
+            "test": "checkout fallback cannot resurrect an erased analytics context",
+            "pass": true
+        }
+    ]
+}

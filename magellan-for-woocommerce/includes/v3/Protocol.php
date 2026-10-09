@@ -12,13 +12,25 @@ final class Protocol {
     // Integer string arithmetic: never multiply binary floating point by 100.
     public static function money($decimal, string $currency, int $exponent): array {
         $s = (string) $decimal;
-        if ($exponent < 0 || $exponent > 6 || !preg_match('/^(-?)(\d+)(?:\.(\d+))?$/D', $s, $m)) {
+        // WooCommerce's computed cart values may be floats or scientific notation.
+        // Expand the decimal representation before rounding; never multiply a float.
+        if (preg_match('/^(-?)(\d+)(?:\.(\d+))?[eE]([+-]?\d+)$/D', $s, $scientific)) {
+            $shift = (int) $scientific[4];
+            if (abs($shift) > 100) { throw new \InvalidArgumentException('invalid_money'); }
+            $digits = $scientific[2] . ($scientific[3] ?? ''); $point = strlen($scientific[2]) + $shift;
+            $s = $scientific[1] . ($point <= 0 ? '0.' . str_repeat('0', -$point) . $digits : ($point >= strlen($digits) ? $digits . str_repeat('0', $point - strlen($digits)) : substr($digits, 0, $point) . '.' . substr($digits, $point)));
+        }
+        if ($exponent < 0 || $exponent > 6 || strlen($s) > 150 || !preg_match('/^(-?)(\d+)(?:\.(\d+))?$/D', $s, $m)) {
             throw new \InvalidArgumentException('invalid_money');
         }
         $fraction = $m[3] ?? '';
-        if (trim(substr($fraction, $exponent), '0') !== '') { throw new \InvalidArgumentException('currency_precision_mismatch'); }
         $digits = ltrim($m[2] . str_pad(substr($fraction, 0, $exponent), $exponent, '0'), '0');
         $digits = $digits === '' ? '0' : $digits;
+        // Half up at the channel currency exponent, including negative refunds.
+        if (isset($fraction[$exponent]) && $fraction[$exponent] >= '5') {
+            for ($i = strlen($digits) - 1; $i >= 0 && $digits[$i] === '9'; $i--) { $digits[$i] = '0'; }
+            if ($i < 0) { $digits = '1' . $digits; } else { $digits[$i] = (string) ((int) $digits[$i] + 1); }
+        }
         return ['currency' => $currency, 'exponent' => $exponent, 'amount_minor' => ($m[1] === '-' && $digits !== '0' ? '-' : '') . $digits];
     }
 

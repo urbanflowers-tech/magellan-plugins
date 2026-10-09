@@ -155,139 +155,41 @@ class Magellan_Identity {
 	 * Batches of 500 sent to Magellan via /v1/pixel/identities.
 	 * Within each batch, deduplicated by hash.
 	 */
-	public static function run_historical_sync(): void {
-		if ( ! Magellan_Admin::is_configured() ) {
-			// Reschedule for 1h if not yet configured
-			wp_schedule_single_event( time() + 3600, 'magellan_historical_identity_sync' );
-			return;
-		}
-
-		$sync_run_id = 'sync_' . substr( bin2hex( random_bytes( 6 ) ), 0, 12 );
-		$batch_size  = 500;
-
-		// PHASE 1 — Registered customers via wp_users with WC role
-		$paged   = 1;
-		$batches = [];
-
-		while ( true ) {
-			$users_query = new WP_User_Query( [
-				'role__in' => [ 'customer', 'subscriber' ],
-				'number'   => $batch_size,
-				'paged'    => $paged,
-				'fields'   => [ 'ID', 'user_email', 'user_registered' ],
-			] );
-			$users = $users_query->get_results();
-			if ( empty( $users ) ) {
-				break;
-			}
-
-			$identities = [];
-			$seen       = [];
-
-			foreach ( $users as $user ) {
-				if ( empty( $user->user_email ) ) {
-					continue;
-				}
-				$email_hash = self::hash_email( $user->user_email );
-				if ( $email_hash === '' || isset( $seen[ $email_hash ] ) ) {
-					continue;
-				}
-				$seen[ $email_hash ] = true;
-
-				$order_count  = function_exists( 'wc_get_customer_order_count' )
-					? (int) wc_get_customer_order_count( $user->ID )
-					: 0;
-				$identities[] = [
-					'email_hash'           => $email_hash,
-					'phone_hash'           => null, // skipped in phase 1 — phone is on the order, not the user
-					'first_seen_at'        => $user->user_registered,
-					'last_seen_at'         => $user->user_registered,
-					'order_count'          => $order_count,
-					'external_customer_id' => 'wp_user_' . $user->ID,
-				];
-			}
-
-			if ( ! empty( $identities ) ) {
-				$batches[] = $identities;
-			}
-			$paged++;
-			if ( count( $users ) < $batch_size ) {
-				break;
-			}
-		}
-
-		// PHASE 2 — Guest checkout emails from historical orders
-		// Gather emails from completed/processing orders where user_id = 0
-		$guest_paged = 1;
-		$seen_guest  = [];
-
-		while ( true ) {
-			$args = [
-				'limit'        => $batch_size,
-				'page'         => $guest_paged,
-				'status'       => [ 'wc-completed', 'wc-processing', 'wc-refunded' ],
-				'customer_id'  => 0,
-				'orderby'      => 'date',
-				'order'        => 'ASC',
-				'return'       => 'objects',
-				'paginate'     => false,
-			];
-
-			$orders = wc_get_orders( $args );
-			if ( empty( $orders ) ) {
-				break;
-			}
-
-			$identities = [];
-
-			foreach ( $orders as $order ) {
-				$email = $order->get_billing_email();
-				if ( ! $email ) {
-					continue;
-				}
-				$email_hash = self::hash_email( $email );
-				if ( $email_hash === '' || isset( $seen_guest[ $email_hash ] ) ) {
-					continue;
-				}
-				$seen_guest[ $email_hash ] = true;
-
-				$phone      = $order->get_billing_phone();
-				$country    = $order->get_billing_country();
-				$phone_hash = $phone ? self::hash_phone( $phone, $country ) : null;
-				if ( $phone_hash === '' ) {
-					$phone_hash = null;
-				}
-
-				$created = $order->get_date_created();
-				$identities[] = [
-					'email_hash'           => $email_hash,
-					'phone_hash'           => $phone_hash,
-					'first_seen_at'        => $created ? gmdate( 'c', $created->getTimestamp() ) : gmdate( 'c' ),
-					'last_seen_at'         => $created ? gmdate( 'c', $created->getTimestamp() ) : gmdate( 'c' ),
-					'order_count'          => 1, // best-effort; backend dedupes
-					'external_customer_id' => null,
-				];
-			}
-
-			if ( ! empty( $identities ) ) {
-				$batches[] = $identities;
-			}
-			$guest_paged++;
-			if ( count( $orders ) < $batch_size ) {
-				break;
-			}
-		}
-
-		// Dispatch all batches
-		$total = count( $batches );
-		foreach ( $batches as $i => $batch ) {
-			Magellan_Sender::send_identity_batch(
-				$batch,
-				$sync_run_id,
-				$i + 1,
-				$total,
-				( $i + 1 === $total )
-			);
-		}
-	}
+    public static function run_historical_sync(): void {
+        if (!Magellan_Admin::is_configured()) { self::continue_sync(3600); return; }
+        $size = 100;
+        $cursor = (array) get_option('magellan_identity_sync_cursor', []);
+        if (!$cursor) {
+            $users = new WP_User_Query(['role'=>'customer','number'=>1,'fields'=>'ID','count_total'=>true]);
+            $guests = wc_get_orders(['customer_id'=>0,'status'=>['wc-completed','wc-processing','wc-refunded'],'limit'=>1,'paginate'=>true]);
+            $cursor = ['run'=>'sync_'.bin2hex(random_bytes(6)), 'batch'=>1, 'user_pages'=>(int)ceil($users->get_total()/$size), 'guest_pages'=>(int)ceil($guests->total/$size)];
+            update_option('magellan_identity_sync_cursor',$cursor,false);
+        }
+        $total = $cursor['user_pages'] + $cursor['guest_pages'];
+        $batch = $cursor['batch']; $identities = [];
+        if ($batch > $total) { delete_option('magellan_identity_sync_cursor'); update_option('magellan_identity_sync_completed',gmdate('c'),false); return; }
+        if ($batch <= $cursor['user_pages']) {
+            $query = new WP_User_Query(['role'=>'customer','number'=>$size,'paged'=>$batch,'orderby'=>'ID','order'=>'ASC','fields'=>['ID','user_email','user_registered'],'count_total'=>false]);
+            foreach ($query->get_results() as $user) {
+                if (!$user->user_email) { continue; }
+                $identities[] = ['email_hash'=>self::hash_email($user->user_email),'phone_hash'=>null,'first_seen_at'=>$user->user_registered,'last_seen_at'=>$user->user_registered,'order_count'=>function_exists('wc_get_customer_order_count')?(int)wc_get_customer_order_count($user->ID):0,'external_customer_id'=>'wp_user_'.$user->ID];
+            }
+        } else {
+            $orders = wc_get_orders(['customer_id'=>0,'status'=>['wc-completed','wc-processing','wc-refunded'],'limit'=>$size,'page'=>$batch-$cursor['user_pages'],'orderby'=>'ID','order'=>'ASC']);
+            foreach ($orders as $order) {
+                if (!$order->get_billing_email()) { continue; }
+                $created = $order->get_date_created(); $at = $created ? gmdate('c',$created->getTimestamp()) : gmdate('c');
+                $identities[] = ['email_hash'=>self::hash_email($order->get_billing_email()),'phone_hash'=>self::hash_phone($order->get_billing_phone(),$order->get_billing_country()) ?: null,'first_seen_at'=>$at,'last_seen_at'=>$at,'order_count'=>1,'external_customer_id'=>null];
+            }
+        }
+        try {
+            if (!Magellan_Sender::send_identity_batch($identities,$cursor['run'],$batch,$total,$batch===$total)) { self::continue_sync(3600); return; }
+            $cursor['batch']++; update_option('magellan_identity_sync_cursor',$cursor,false);
+            if ($cursor['batch']>$total) { delete_option('magellan_identity_sync_cursor'); update_option('magellan_identity_sync_completed',gmdate('c'),false); }
+            else { self::continue_sync(60); }
+        } catch (\Throwable $e) { Magellan_Admin::record_error('Historical identity sync will retry its current page.'); self::continue_sync(3600); }
+    }
+    private static function continue_sync(int $delay): void {
+        if (!wp_next_scheduled('magellan_historical_identity_sync')) { wp_schedule_single_event(time()+$delay,'magellan_historical_identity_sync'); }
+    }
 }

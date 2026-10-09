@@ -26,7 +26,7 @@ final class Capture {
     }
     public static function dirty_order($id): void { if (!self::$saving) { self::$orders[(int) $id] = true; } }
     public static function dirty_cart(): void { self::$cart_dirty = true; }
-    public static function saved_context($order): array { $context = $order->get_meta('_mgln_v3_context'); return is_array($context) ? $context : []; }
+    public static function saved_context($order): array { if ($order->get_meta('_mgln_v3_analytics_erased')) { return []; } $context = $order->get_meta('_mgln_v3_context'); return is_array($context) ? $context : []; }
     public static function context(): array {
         $base = ['visitor_id' => null, 'session_id' => null, 'cart_id' => self::cart_id(false), 'consent' => Protocol::consent(), 'link_provenance' => 'unavailable'];
         if (!Config::analytics()) { return $base; }
@@ -102,13 +102,13 @@ final class Capture {
         $lines = [];
         foreach ($items as $item) {
             $product = $item->get_product();
-            $lines[] = ['line_id' => (string) $item->get_id(), 'refunded_line_id' => $item->get_meta('_refunded_item_id') ? (string) $item->get_meta('_refunded_item_id') : null, 'product_id' => (string) $item->get_product_id(), 'variation_id' => $item->get_variation_id() ? (string) $item->get_variation_id() : null, 'sku' => $product ? substr((string) $product->get_sku(), 0, 128) : '', 'quantity' => (string) $item->get_quantity(), 'unit' => 'item', 'subtotal' => Protocol::money($item->get_subtotal(), $currency, $exp), 'total' => Protocol::money($item->get_total(), $currency, $exp), 'tax' => Protocol::money($item->get_total_tax(), $currency, $exp)];
+            $lines[] = ['line_id' => (string) $item->get_id(), 'refunded_line_id' => $item->get_meta('_refunded_item_id') ? (string) $item->get_meta('_refunded_item_id') : null, 'product_id' => (string) $item->get_product_id(), 'variation_id' => $item->get_variation_id() ? (string) $item->get_variation_id() : null, 'sku' => $product ? substr((string) $product->get_sku(), 0, 128) : '', 'quantity' => (string) $item->get_quantity(), 'unit' => 'item', 'subtotal' => Protocol::money($item->get_subtotal('edit'), $currency, $exp), 'total' => Protocol::money($item->get_total('edit'), $currency, $exp), 'tax' => Protocol::money($item->get_total_tax('edit'), $currency, $exp)];
         }
         return $lines;
     }
-    public static function snapshot(int $id): void {
+    public static function snapshot(int $id): bool {
         $order = wc_get_order($id);
-        if (!$order || $order instanceof \WC_Order_Refund || $order->get_type() !== 'shop_order' || $order->get_status() === 'auto-draft' || $order->get_status() === 'checkout-draft') { return; }
+        if (!$order || $order instanceof \WC_Order_Refund || $order->get_type() !== 'shop_order' || $order->get_status() === 'auto-draft' || $order->get_status() === 'checkout-draft') { return true; }
         try {
             $currency = $order->get_currency(); $stored = $order->get_meta('_mgln_v3_currency_exponent'); $exp = $stored === '' ? self::exponent($currency) : (int) $stored;
             $money = static fn($amount) => Protocol::money($amount, $currency, $exp);
@@ -116,21 +116,22 @@ final class Capture {
             $native = [];
             foreach (['source_type','utm_source','utm_medium','utm_campaign','utm_content','utm_term'] as $key) {
                 $v = (string) $order->get_meta('_wc_order_attribution_' . $key);
-                if ($v !== '' && strlen($v) <= 128 && strpos($v, '@') === false) { $native[$key] = sanitize_text_field($v); }
+                if (!$order->get_meta('_mgln_v3_analytics_erased') && $v !== '' && strlen($v) <= 128 && strpos($v, '@') === false) { $native[$key] = sanitize_text_field($v); }
             }
-            $fees = []; foreach ($order->get_items('fee') as $item) { $fees[] = ['line_id' => (string) $item->get_id(), 'total' => $money($item->get_total()), 'tax' => $money($item->get_total_tax())]; }
-            $taxes = []; foreach ($order->get_items('tax') as $item) { $taxes[] = ['line_id' => (string) $item->get_id(), 'rate_id' => (string) $item->get_rate_id(), 'total' => $money($item->get_tax_total()), 'shipping' => $money($item->get_shipping_tax_total())]; }
+            $fees = []; foreach ($order->get_items('fee') as $item) { $fees[] = ['line_id' => (string) $item->get_id(), 'total' => $money($item->get_total('edit')), 'tax' => $money($item->get_total_tax('edit'))]; }
+            $taxes = []; foreach ($order->get_items('tax') as $item) { $taxes[] = ['line_id' => (string) $item->get_id(), 'rate_id' => (string) $item->get_rate_id(), 'total' => $money($item->get_tax_total('edit')), 'shipping' => $money($item->get_shipping_tax_total('edit'))]; }
             $subs = ['adapter' => 'unavailable'];
             if (function_exists('wcs_order_contains_renewal')) { $subs = ['adapter' => 'woocommerce_subscriptions', 'renewal' => wcs_order_contains_renewal($order), 'subscription_order' => wcs_order_contains_subscription($order)]; }
-            $p = ['source_system' => 'woocommerce', 'order_id' => (string) $id, 'status' => $order->get_status(), 'created_at' => self::date($order->get_date_created()), 'modified_at' => self::date($order->get_date_modified()), 'currency' => $currency, 'exponent' => $exp, 'amounts' => ['subtotal' => $money($order->get_subtotal()), 'discount' => $money($order->get_discount_total()), 'shipping' => $money($order->get_shipping_total()), 'tax' => $money($order->get_total_tax()), 'total' => $money($order->get_total())], 'lines' => self::lines($order->get_items(), $currency, $exp), 'fees' => $fees, 'taxes' => $taxes, 'payment_method' => $order->get_payment_method(), 'transaction_id' => $order->get_transaction_id() ?: null, 'paid_at' => self::date($order->get_date_paid()), 'checkout_context' => $context ?: (object) [], 'native_attribution' => $native ? ['provenance' => 'woocommerce_metadata_only', 'values' => $native] : (object) [], 'channel_origin' => $order->get_meta('_mgln_v3_origin') === 'web_checkout' ? 'web_checkout' : ($order->get_created_via() === 'admin' ? 'other' : 'unknown'), 'subscriptions' => $subs];
+            $p = ['source_system' => 'woocommerce', 'order_id' => (string) $id, 'status' => $order->get_status(), 'created_at' => self::date($order->get_date_created()), 'modified_at' => self::date($order->get_date_modified()), 'currency' => $currency, 'exponent' => $exp, 'amounts' => ['subtotal' => $money($order->get_subtotal()), 'discount' => $money($order->get_discount_total('edit')), 'shipping' => $money($order->get_shipping_total('edit')), 'tax' => $money($order->get_total_tax('edit')), 'total' => $money($order->get_total('edit'))], 'lines' => self::lines($order->get_items(), $currency, $exp), 'fees' => $fees, 'taxes' => $taxes, 'payment_method' => $order->get_payment_method(), 'transaction_id' => $order->get_transaction_id() ?: null, 'paid_at' => self::date($order->get_date_paid()), 'checkout_context' => $context ?: (object) [], 'native_attribution' => $native ? ['provenance' => 'woocommerce_metadata_only', 'values' => $native] : (object) [], 'channel_origin' => $order->get_meta('_mgln_v3_origin') === 'web_checkout' ? 'web_checkout' : ($order->get_created_via() === 'admin' ? 'other' : 'unknown'), 'subscriptions' => $subs];
             $revision = hash('sha256', Protocol::json($p));
-            if ($order->get_meta('_mgln_v3_snapshot_hash') === $revision) { return; }
+            if ($order->get_meta('_mgln_v3_snapshot_hash') === $revision) { return true; }
             $p['source_revision'] = $revision; $p['snapshot_id'] = wp_generate_uuid4();
             $chunks = array_chunk($p['lines'], 50) ?: [[]]; $p['pages'] = count($chunks);
             $entity = ['source_system' => 'woocommerce', 'type' => 'order', 'id' => (string) $id, 'revision' => $revision];
-            foreach ($chunks as $i => $lines) { $p['lines'] = $lines; $p['page'] = $i + 1; if (!Outbox::capture('order_snapshot', $p, $entity, $context, self::date($order->get_date_modified()))) { return; } }
+            foreach ($chunks as $i => $lines) { $p['lines'] = $lines; $p['page'] = $i + 1; if (!Outbox::capture('order_snapshot', $p, $entity, $context, self::date($order->get_date_modified()))) { Recovery::mark($id, 'order_snapshot_queue_failed'); return false; } }
             self::$saving = true; $order->update_meta_data('_mgln_v3_snapshot_hash', $revision); $order->save_meta_data(); self::$saving = false;
-        } catch (\Throwable $e) { self::$saving = false; Outbox::gap('order_snapshot_' . ($e instanceof \InvalidArgumentException ? $e->getMessage() : 'failed')); }
+            return true;
+        } catch (\Throwable $e) { self::$saving = false; Outbox::gap('order_snapshot_' . ($e instanceof \InvalidArgumentException ? $e->getMessage() : 'failed')); Recovery::mark($id, 'order_snapshot_failed'); return false; }
     }
     public static function status($id, $from, $to, $order): void {
         $p = ['order_id' => (string) $id, 'from_status' => (string) $from, 'to_status' => (string) $to, 'source_revision' => (string) (self::date($order->get_date_modified()) ?? gmdate('c'))];
@@ -141,21 +142,21 @@ final class Capture {
         $p = ['order_id' => (string) $id, 'payment_method' => $order->get_payment_method(), 'transaction_id' => $order->get_transaction_id() ?: null, 'source_state' => 'woocommerce_payment_complete', 'paid_at' => self::date($order->get_date_paid()), 'settlement_verified' => false];
         Outbox::capture('payment_fact', $p, null, self::saved_context($order), self::date($order->get_date_paid())); self::dirty_order($id);
     }
-    public static function refund($id, $refund_id): void {
+    public static function refund($id, $refund_id): bool {
         try {
-            $order = wc_get_order($id); $refund = wc_get_order($refund_id); if (!$order || !$refund instanceof \WC_Order_Refund) { return; }
+            $order = wc_get_order($id); $refund = wc_get_order($refund_id); if (!$order || !$refund instanceof \WC_Order_Refund) { return true; }
             $currency = $order->get_currency(); $exp = self::exponent($currency); $lines = self::lines($refund->get_items(), $currency, $exp);
-            $p = ['order_id' => (string) $id, 'refund_id' => (string) $refund_id, 'source_revision' => hash('sha256', Protocol::json([$refund->get_amount(), $lines])), 'status' => $refund->get_status(), 'amount' => Protocol::money($refund->get_amount(), $currency, $exp), 'created_at' => self::date($refund->get_date_created()), 'lines' => $lines, 'allocations_available' => !empty($lines), 'provider_refund_id' => null];
+            $p = ['order_id' => (string) $id, 'refund_id' => (string) $refund_id, 'source_revision' => hash('sha256', Protocol::json([$refund->get_amount('edit'), $lines])), 'status' => $refund->get_status(), 'amount' => Protocol::money($refund->get_amount('edit'), $currency, $exp), 'created_at' => self::date($refund->get_date_created()), 'lines' => $lines, 'allocations_available' => !empty($lines), 'provider_refund_id' => null];
             if ($refund->get_meta('_mgln_v3_refund_hash') !== $p['source_revision']) {
                 $chunks = array_chunk($lines, 50) ?: [[]]; $p['pages'] = count($chunks); $p['snapshot_id'] = wp_generate_uuid4();
                 foreach ($chunks as $i => $chunk) {
                     $p['page'] = $i + 1; $p['lines'] = $chunk;
-                    if (!Outbox::capture('refund_recorded', $p, ['source_system' => 'woocommerce', 'type' => 'refund', 'id' => (string) $refund_id, 'revision' => $p['source_revision']], self::saved_context($order), $p['created_at'])) { return; }
+                    if (!Outbox::capture('refund_recorded', $p, ['source_system' => 'woocommerce', 'type' => 'refund', 'id' => (string) $refund_id, 'revision' => $p['source_revision']], self::saved_context($order), $p['created_at'])) { Recovery::mark((int) $id, 'refund_queue_failed'); return false; }
                 }
                 $refund->update_meta_data('_mgln_v3_refund_hash', $p['source_revision']); $refund->save_meta_data();
             }
-            self::dirty_order($id);
-        } catch (\Throwable $e) { Outbox::gap('refund_capture_failed'); }
+            self::dirty_order($id); return true;
+        } catch (\Throwable $e) { Outbox::gap('refund_capture_failed'); Recovery::mark((int) $id, 'refund_capture_failed'); return false; }
     }
     public static function cart(): void {
         if (!function_exists('WC') || !WC()->cart || !WC()->session) { return; }
@@ -195,16 +196,33 @@ final class Capture {
             if (Outbox::capture('entity_changed', ['type' => $post->post_type, 'id' => (string) $id, 'revision' => $revision, 'path' => substr($path, 0, 512), 'previous_path' => get_post_meta($id, '_mgln_v3_path', true) ?: null])) { update_post_meta($id, '_mgln_v3_presentation', $revision); update_post_meta($id, '_mgln_v3_path', $path); }
         } self::$entities = [];
     }
+    public static function reconcile_order(int $id): void {
+        $ok = self::snapshot($id); $order = wc_get_order($id);
+        if ($order) { foreach ($order->get_refunds() as $refund) { $ok = self::refund($id, $refund->get_id()) && $ok; } }
+        if ($ok) { Recovery::clear($id); }
+    }
     public static function reconcile(): void {
-        // Fixed upper boundary + overlapping completed windows; never advances on partial capture.
-        $cursor = (array) get_option('magellan_v3_reconcile', []);
-        $since = $cursor['since'] ?? max(0, time() - 86400);
-        $until = $cursor['until'] ?? time(); $page = $cursor['page'] ?? 1;
-        $before_gap = get_option('magellan_v3_capture_gap');
-        $orders = wc_get_orders(['type' => 'shop_order', 'limit' => 25, 'page' => $page, 'orderby' => 'ID', 'order' => 'ASC', 'date_modified' => $since . '...' . $until]);
-        foreach ($orders as $order) { self::snapshot($order->get_id()); foreach ($order->get_refunds() as $refund) { self::refund($order->get_id(), $refund->get_id()); } }
-        if (get_option('magellan_v3_capture_gap') !== $before_gap) { return; }
-        $next = count($orders) === 25 ? ['since' => $since, 'until' => $until, 'page' => $page + 1] : ['since' => max(0, $until - 300), 'page' => 1];
-        update_option('magellan_v3_reconcile', $next, false);
+        if (!Config::ready()) { return; }
+        global $wpdb;
+        // A short, connection-scoped mutex prevents overlapping WP-Cron/AS/CLI cursors.
+        $lock = 'mgln_scan_' . md5(Outbox::table());
+        if ((int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s,0)', $lock)) !== 1) { return; }
+        try {
+            $deadline = microtime(true) + 5;
+            foreach (Recovery::due() as $id) { self::reconcile_order((int) $id); }
+            $cursor = (array) get_option('magellan_v3_reconcile', []);
+            $since = $cursor['since'] ?? max(0, time() - 86400);
+            $until = $cursor['until'] ?? time(); $page = $cursor['page'] ?? 1;
+            // Maximum 100 orders per invocation, followed by a queued continuation.
+            for ($n = 0; $n < 4; $n++) {
+                $orders = wc_get_orders(['type' => 'shop_order', 'limit' => 25, 'page' => $page, 'orderby' => 'ID', 'order' => 'ASC', 'date_modified' => $since . '...' . $until]);
+                foreach ($orders as $order) { self::reconcile_order($order->get_id()); }
+                $more = count($orders) === 25;
+                $next = $more ? ['since' => $since, 'until' => $until, 'page' => ++$page] : ['since' => max(0, $until - 300), 'page' => 1];
+                update_option('magellan_v3_reconcile', $next, false);
+                if (!$more || microtime(true) >= $deadline) { break; }
+            }
+            if ($more) { Recovery::schedule(); }
+        } finally { $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock)); }
     }
 }

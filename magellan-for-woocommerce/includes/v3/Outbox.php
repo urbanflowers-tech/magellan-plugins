@@ -5,6 +5,7 @@ defined('ABSPATH') || exit;
 /** Durable, immutable source events. Action Scheduler is only a wake-up mechanism. */
 final class Outbox {
     const HOOK = 'magellan_v3_drain';
+    private static array $completed = [];
     public static function table(): string { global $wpdb; return $wpdb->prefix . 'magellan_v3_outbox'; }
     public static function quota(): string { global $wpdb; return $wpdb->prefix . 'magellan_v3_quota'; }
     public static function install(): void {
@@ -49,13 +50,18 @@ final class Outbox {
     }
     public static function init(): void {
         add_action(self::HOOK, [self::class, 'drain']);
-        add_action('action_scheduler_completed_action', static function ($id) { if (class_exists('ActionScheduler')) { $action = \ActionScheduler::store()->fetch_action($id); if ($action->get_hook() === self::HOOK) { self::next(); } } });
+        // after_execute receives the action, but runs BEFORE mark_complete. Remember only
+        // our ID, then schedule after completion without fetching every site's AS job.
+        add_action('action_scheduler_after_execute', static function ($id, $action) { if ($action->get_hook() === self::HOOK) { self::$completed[$id] = true; } }, 10, 2);
+        add_action('action_scheduler_completed_action', static function ($id) { if (isset(self::$completed[$id])) { unset(self::$completed[$id]); self::next(); } });
         add_action('magellan_v3_maintenance', [self::class, 'maintenance']);
         if (get_option('magellan_v3_db_version') !== '2') { self::install(); }
-        if (!wp_next_scheduled('magellan_v3_maintenance')) { wp_schedule_event(time() + 300, 'hourly', 'magellan_v3_maintenance'); }
+        add_action('action_scheduler_init', [self::class, 'ensure_maintenance']);
+        self::ensure_maintenance();
     }
     public static function gap(string $code): void {
-        update_option('magellan_v3_capture_gap', ['id' => wp_generate_uuid4(), 'code' => $code, 'at' => gmdate('c'), 'requires_reconciliation' => true], false);
+        $gap = (array) get_option('magellan_v3_capture_gap', []);
+        update_option('magellan_v3_capture_gap', ['id' => $gap['id'] ?? wp_generate_uuid4(), 'code' => $code, 'at' => $gap['at'] ?? gmdate('c'), 'last_at' => gmdate('c'), 'count' => ($gap['count'] ?? 0) + 1, 'requires_reconciliation' => true], false);
     }
     public static function capture(string $type, array $payload, ?array $entity = null, array $context = [], ?string $occurred = null, string $purpose = 'commerce'): ?string {
         if (!Config::ready()) { return null; }
@@ -69,8 +75,9 @@ final class Outbox {
             $body = Protocol::json($event);
             if (strlen($body) > 240000) { self::gap('oversize_capture'); return null; }
             $quota = self::quota(); $reserved = strlen($body) + 20;
-            $limit_rows = $purpose === 'health' ? 45000 : 50000;
-            $limit_bytes = $purpose === 'health' ? 94371840 : 104857600;
+            $optional = in_array($type, ['health_report','cart_snapshot','cart_emptied','entity_changed','entity_deleted'], true);
+            $limit_rows = $optional ? 40000 : ($purpose === 'privacy' ? 50000 : 49000);
+            $limit_bytes = $optional ? 83886080 : ($purpose === 'privacy' ? 104857600 : 102760448);
             $reserved_ok = $wpdb->query($wpdb->prepare("UPDATE $quota SET pending_rows=pending_rows+1,reserved_bytes=reserved_bytes+%d WHERE id=1 AND pending_rows<%d AND reserved_bytes+%d<=%d", $reserved, $limit_rows, $reserved, $limit_bytes));
             if ($reserved_ok !== 1) { self::gap('outbox_capacity_or_quota_unavailable'); return null; }
             $ok = $wpdb->insert($table, ['event_id' => $id, 'installation_id' => $c['installation_id'], 'entity_key' => $entity ? $entity['type'] . ':' . $entity['id'] : '', 'purpose' => $purpose, 'payload' => '', 'reserved_bytes' => $reserved, 'state' => 'building', 'next_attempt_at' => $now, 'created_at' => $now]);
@@ -88,7 +95,7 @@ final class Outbox {
     }
     public static function schedule(int $delay): void {
         if (function_exists('as_schedule_single_action') && did_action('action_scheduler_init')) {
-            as_schedule_single_action(time() + max(1, $delay), self::HOOK, [], 'magellan-v3', true);
+            if (!as_has_scheduled_action(self::HOOK, [], 'magellan-v3')) { as_schedule_single_action(time() + max(1, $delay), self::HOOK, [], 'magellan-v3', true); }
         } elseif (!wp_next_scheduled(self::HOOK)) { wp_schedule_single_event(time() + max(1, $delay), self::HOOK); }
     }
     public static function unresolved(): int { global $wpdb; return (int) $wpdb->get_var('SELECT COUNT(*) FROM ' . self::table() . " WHERE state <> 'accepted'"); }
@@ -100,25 +107,27 @@ final class Outbox {
     public static function retry_delay(int $attempt, int $retry_after = 0): int {
         return min(21600, max($retry_after, (int) (min(21600, 30 * (2 ** min(10, max(0, $attempt - 1))))) + random_int(0, 15)));
     }
-    public static function retry(array $rows, string $code, int $retry_after = 0): void {
+    public static function retry(array $rows, string $code, int $retry_after = 0, bool $transport_failure = false): void {
         global $wpdb; $table = self::table(); $next = time() + 21600;
         foreach ($rows as $row) {
             $when = time() + self::retry_delay((int) $row['attempts'] + 1, $retry_after); $next = min($next, $when);
             $state = time() - (int) $row['created_at'] >= 604800 ? 'dead_letter' : 'pending';
             $wpdb->update($table, ['state' => $state, 'next_attempt_at' => $when, 'lease_until' => 0, 'lease_token' => '', 'last_error' => $code], ['seq' => $row['seq'], 'state' => 'leased', 'lease_token' => $row['lease_token']]);
         }
-        update_option('magellan_v3_circuit', $next, false);
+        if ($transport_failure && $rows) { update_option('magellan_v3_circuit', $next, false); }
     }
     public static function drain(): void {
         global $wpdb; $table = self::table();
         update_option('magellan_v3_last_runner', gmdate('c'), false);
         if (!Config::ready() || get_option('magellan_v3_auth_blocked')) { return; }
+        self::cleanup();
+        Privacy::process();
         $c = Config::get(); $circuit = (int) get_option('magellan_v3_circuit', 0);
         if ($circuit > time()) { self::schedule($circuit - time()); return; }
         $wpdb->query($wpdb->prepare("UPDATE $table SET state='pending',lease_token='',lease_until=0 WHERE state='leased' AND lease_until<%d", time()));
         $lease = wp_generate_uuid4();
-        $wpdb->query($wpdb->prepare("UPDATE $table SET state='leased',lease_token=%s,lease_until=%d WHERE state='pending' AND next_attempt_at<=%d AND installation_id=%s ORDER BY seq LIMIT 50", $lease, time() + 120, time(), $c['installation_id']));
-        $claimed = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE lease_token=%s AND state='leased' ORDER BY seq", $lease), ARRAY_A);
+        $wpdb->query($wpdb->prepare("UPDATE $table SET state='leased',lease_token=%s,lease_until=%d WHERE state='pending' AND next_attempt_at<=%d AND installation_id=%s ORDER BY (purpose='privacy') DESC,seq LIMIT 50", $lease, time() + 120, time(), $c['installation_id']));
+        $claimed = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE lease_token=%s AND state='leased' ORDER BY (purpose='privacy') DESC,seq", $lease), ARRAY_A);
         if (!$claimed) { self::next(); return; }
         $rows = []; $parts = []; $size = 13;
         foreach ($claimed as $row) {
@@ -129,8 +138,9 @@ final class Outbox {
         $body = '{"events":[' . implode(',', $parts) . ']}';
         try {
             $response = wp_safe_remote_post($c['events_url'], ['body' => $body, 'headers' => Protocol::headers($c, 'POST', $c['events_url'], $body), 'timeout' => 8, 'redirection' => 0, 'limit_response_size' => 65536]);
-            if (is_wp_error($response)) { self::retry($rows, 'network_error'); return; }
+            if (is_wp_error($response)) { self::retry($rows, 'network_error', 0, true); return; }
             $status = (int) wp_remote_retrieve_response_code($response);
+            if ($status !== 429 && $status < 500) { delete_option('magellan_v3_circuit'); }
             if (in_array($status, [401,403,410], true)) {
                 foreach ($rows as $row) { $wpdb->update($table, ['state' => 'blocked', 'last_error' => 'authentication_' . $status, 'lease_until' => 0], ['seq' => $row['seq'], 'lease_token' => $lease, 'state' => 'leased']); }
                 $wpdb->query($wpdb->prepare("UPDATE $table SET state='blocked',last_error='authentication_paused' WHERE state='pending' AND installation_id=%s", $c['installation_id']));
@@ -145,7 +155,7 @@ final class Outbox {
             foreach ($rows as $row) {
                 $r = $receipts[$row['event_id']] ?? [];
                 $match = is_string($r['body_hash'] ?? null) && hash_equals($row['body_hash'], $r['body_hash']);
-                if (in_array($status, [200,202,207], true) && $match && in_array($r['status'] ?? '', ['accepted','duplicate'], true) && is_string($r['receipt_id'] ?? null) && $r['receipt_id'] !== '' && !empty($r['received_at']) && strtotime($r['received_at']) !== false) {
+                if (in_array($status, [200,202,207], true) && $match && in_array($r['status'] ?? '', ['accepted','duplicate'], true) && is_string($r['receipt_id'] ?? null) && $r['receipt_id'] !== '' && is_string($r['received_at'] ?? null) && preg_match('/^\d{4}-\d{2}-\d{2}T/', $r['received_at']) && strtotime($r['received_at']) !== false) {
                     $accepted = $wpdb->update($table, ['state' => 'accepted', 'accepted_at' => time(), 'receipt' => Protocol::json($r), 'lease_until' => 0, 'lease_token' => '', 'last_error' => ''], ['seq' => $row['seq'], 'lease_token' => $lease, 'state' => 'leased']);
                     if ($accepted === 1) { $quota = self::quota(); $wpdb->query("UPDATE $quota SET pending_rows=GREATEST(0,CAST(pending_rows AS SIGNED)-1) WHERE id=1"); }
                     update_option('magellan_v3_last_receipt', $r['received_at'], false);
@@ -156,9 +166,9 @@ final class Outbox {
             if ($pending) {
                 $retry = wp_remote_retrieve_header($response, 'retry-after');
                 $seconds = is_numeric($retry) ? (int) $retry : max(0, (int) strtotime((string) $retry) - time());
-                self::retry($pending, 'http_' . $status . '_unacknowledged', $seconds);
+                self::retry($pending, 'http_' . $status . '_unacknowledged', $seconds, $status === 429 || $status >= 500);
             } else { delete_option('magellan_v3_circuit'); }
-        } catch (\Throwable $e) { self::retry($rows, 'transport_exception'); }
+        } catch (\Throwable $e) { self::retry($rows, 'transport_exception', 0, true); }
         finally { self::next(); }
     }
     public static function next(): void {
@@ -168,15 +178,38 @@ final class Outbox {
     }
     public static function stats(): array {
         global $wpdb; $table = self::table();
-        return ['quota' => $wpdb->get_row('SELECT pending_rows,reserved_bytes FROM ' . self::quota() . ' WHERE id=1', ARRAY_A), 'states' => $wpdb->get_results("SELECT state,COUNT(*) AS count,MIN(created_at) AS oldest_at FROM $table GROUP BY state", ARRAY_A), 'recent_errors' => $wpdb->get_results("SELECT event_id,entity_key,state,last_error,attempts FROM $table WHERE state IN ('blocked','dead_letter') ORDER BY seq DESC LIMIT 10", ARRAY_A), 'bytes' => (int) $wpdb->get_var("SELECT COALESCE(SUM(OCTET_LENGTH(payload)),0) FROM $table"), 'last_capture' => get_option('magellan_v3_last_capture', null), 'last_receipt' => get_option('magellan_v3_last_receipt', null), 'last_runner' => get_option('magellan_v3_last_runner', null), 'capture_gap' => get_option('magellan_v3_capture_gap', null), 'auth_blocked' => (bool) get_option('magellan_v3_auth_blocked', false), 'runner' => function_exists('as_schedule_single_action') ? 'action_scheduler' : 'wp_cron', 'real_cron_verified' => false];
+        $quota = $wpdb->get_row('SELECT pending_rows,reserved_bytes FROM ' . self::quota() . ' WHERE id=1', ARRAY_A);
+        return ['quota' => $quota, 'states' => $wpdb->get_results("SELECT state,COUNT(*) AS count,MIN(created_at) AS oldest_at FROM $table GROUP BY state", ARRAY_A), 'recent_errors' => $wpdb->get_results("SELECT event_id,entity_key,state,last_error,attempts FROM $table WHERE state IN ('blocked','dead_letter') ORDER BY seq DESC LIMIT 10", ARRAY_A), 'bytes' => (int) ($quota['reserved_bytes'] ?? 0), 'last_capture' => get_option('magellan_v3_last_capture', null), 'last_receipt' => get_option('magellan_v3_last_receipt', null), 'last_runner' => get_option('magellan_v3_last_runner', null), 'capture_gap' => get_option('magellan_v3_capture_gap', null), 'recovery' => Recovery::stats(), 'last_maintenance' => get_option('magellan_v3_last_maintenance', null), 'auth_blocked' => (bool) get_option('magellan_v3_auth_blocked', false), 'runner' => function_exists('as_schedule_single_action') ? 'action_scheduler' : 'wp_cron', 'real_cron_verified' => false];
+    }
+    public static function ensure_maintenance(): void {
+        if (function_exists('as_schedule_recurring_action') && did_action('action_scheduler_init')) {
+            wp_clear_scheduled_hook('magellan_v3_maintenance');
+            if (!as_has_scheduled_action('magellan_v3_maintenance', [], 'magellan-v3')) { as_schedule_recurring_action(time() + 60, 300, 'magellan_v3_maintenance', [], 'magellan-v3', true); }
+        } elseif (!wp_next_scheduled('magellan_v3_maintenance')) { wp_schedule_event(time() + 60, 'magellan_5min', 'magellan_v3_maintenance'); }
+    }
+    public static function remove_row(array $row): bool {
+        global $wpdb; $table = self::table(); $quota = self::quota();
+        // Compare the immutable ID as well as the lease: stale workers cannot delete a replacement.
+        if ($wpdb->delete($table, ['seq' => $row['seq'], 'event_id' => $row['event_id'], 'state' => $row['state'], 'lease_token' => $row['lease_token']]) !== 1) { return false; }
+        $pending = (int) $row['accepted_at'] === 0 ? 1 : 0;
+        $wpdb->query($wpdb->prepare("UPDATE $quota SET pending_rows=GREATEST(0,CAST(pending_rows AS SIGNED)-%d),reserved_bytes=GREATEST(0,CAST(reserved_bytes AS SIGNED)-%d) WHERE id=1", $pending, $row['reserved_bytes']));
+        return true;
+    }
+    public static function cleanup(): void {
+        global $wpdb; $table = self::table();
+        $bytes = (int) $wpdb->get_var('SELECT reserved_bytes FROM ' . self::quota() . ' WHERE id=1');
+        // Accepted evidence is durable at Magellan. Three days is a maximum local
+        // receipt window; storage pressure may reclaim already accepted bodies earlier.
+        $cutoff = $bytes > 73400320 ? time() + 1 : time() - 259200;
+        $expired = $wpdb->get_results($wpdb->prepare("SELECT seq,event_id,state,lease_token,accepted_at,reserved_bytes FROM $table WHERE state='accepted' AND accepted_at<%d ORDER BY accepted_at LIMIT 1000", $cutoff), ARRAY_A);
+        foreach ($expired as $row) { self::remove_row($row); }
+        // Unacknowledged bodies are never silently pruned. Export/discard is explicit.
     }
     public static function maintenance(): void {
         global $wpdb; $table = self::table();
-        $expired = $wpdb->get_results($wpdb->prepare("SELECT seq,reserved_bytes FROM $table WHERE state='accepted' AND accepted_at<%d ORDER BY seq LIMIT 500", time() - 259200), ARRAY_A);
-        $quota = self::quota();
-        foreach ($expired as $row) {
-            if ($wpdb->delete($table, ['seq' => $row['seq'], 'state' => 'accepted']) === 1) { $wpdb->query($wpdb->prepare("UPDATE $quota SET reserved_bytes=GREATEST(0,CAST(reserved_bytes AS SIGNED)-%d) WHERE id=1", $row['reserved_bytes'])); }
-        }
+        update_option('magellan_v3_last_maintenance', gmdate('c'), false);
+        self::cleanup();
+        Privacy::process();
         $stale = $wpdb->query($wpdb->prepare("UPDATE $table SET state='dead_letter',last_error='capture_incomplete' WHERE state='building' AND created_at<%d", time() - 300));
         if ($stale) { self::gap('capture_incomplete'); }
         // Never recount live quota reservations: a crash can conservatively over-reserve, never under-reserve.

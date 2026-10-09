@@ -1,0 +1,101 @@
+[
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.5",
+    "event_id": "73624f64-fdb0-4e90-a97d-7a4e093d3dc7",
+    "event_type": "page_viewed",
+    "site_id": "resilience_site",
+    "installation_id": "current_install",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T07:47:56.188Z",
+    "captured_at": "2026-10-09T07:47:56.188Z",
+    "visitor_id": "f077ff0d-58a3-471f-af85-aa5eaed0c2c6",
+    "session_id": "c72b6682-af07-430e-8071-34bdec30eee9",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 1,
+    "consent": {
+      "source": "fixture_cmp",
+      "effective_at": "2026-10-09T07:47:56.187Z",
+      "policy_version": "1",
+      "epoch": 10,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "unknown"
+    },
+    "payload": {
+      "navigation_id": "2b15862b-a2b0-4dbe-9df6-0eb27c046c2a",
+      "path": "/landing",
+      "page_id": "42",
+      "entry_type": "content",
+      "classification_version": "1",
+      "storefront": "en",
+      "served_version": null,
+      "product_id": null,
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {
+          "source": "ดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดด",
+          "medium": "ดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดด",
+          "campaign": "ดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดด",
+          "content": "ดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดด",
+          "term": "ดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดด"
+        },
+        "click_ids": {},
+        "click_id_types": [
+          "gclid",
+          "gbraid",
+          "wbraid",
+          "fbclid",
+          "msclkid",
+          "ttclid",
+          "twclid"
+        ],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/landing",
+        "entry_type": "content",
+        "source_evidence": {
+          "utm": {
+            "source": "ดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดด",
+            "medium": "ดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดด",
+            "campaign": "ดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดด",
+            "content": "ดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดด",
+            "term": "ดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดดด"
+          },
+          "click_ids": {
+            "gclid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "gbraid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "wbraid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "fbclid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "msclkid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "ttclid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "twclid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "click_id_types": [
+            "gclid",
+            "gbraid",
+            "wbraid",
+            "fbclid",
+            "msclkid",
+            "ttclid",
+            "twclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T07:47:56.187Z",
+      "session_aliases": [],
+      "stream_id": "01e71489-65e6-4a6b-9c2f-0eeb3a65fae1"
+    }
+  }
+]

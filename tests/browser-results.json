@@ -1,6 +1,7 @@
 {
   "browser": "155.0.8059.40",
   "transport": "intercepted collector responses; real isolated Chrome context",
+  "legacy_pixel_loaded": false,
   "results": [
     {
       "test": "unknown consent makes no collector request",
@@ -100,6 +101,10 @@
     },
     {
       "test": "null entries recover in a real browser",
+      "pass": true
+    },
+    {
+      "test": "large paid landing survives in real Chrome within event budget",
       "pass": true
     },
     {

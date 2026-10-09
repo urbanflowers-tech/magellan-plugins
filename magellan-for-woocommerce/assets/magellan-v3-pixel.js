@@ -33,7 +33,7 @@
     var url = new URL(location.href), utm = {}, click = {}, types = [], ref = null;
     ['source','medium','campaign','content','term'].forEach(function (key) {
       var v = url.searchParams.get('utm_' + key);
-      if (v && v.length <= 128 && !/[@<>\r\n]/.test(v)) utm[key] = v;
+      if (v && !/[@<>\r\n]/.test(v)) utm[key] = Array.from(v).slice(0,128).join('');
     });
     ['gclid','gbraid','wbraid','fbclid','msclkid','ttclid','twclid'].forEach(function (key) {
       var v = url.searchParams.get(key); if (v && /^[A-Za-z0-9_.~-]{1,200}$/.test(v)) { types.push(key); if (consent && consent.advertising === 'granted') click[key] = v; }
@@ -103,6 +103,22 @@
     var changed=ensureSession();
     if (changed && started && type !== 'page_viewed' && type !== 'product_viewed') page();
     var event = envelope(type, payload);
+    if (bytes(JSON.stringify(event)) > 4096 && (type==='page_viewed' || type==='product_viewed')) {
+      // Fit optional source evidence before assigning immutable transport bytes.
+      // Never truncate a click identifier into a different identifier.
+      event.payload=JSON.parse(JSON.stringify(payload));
+      var sources=[event.payload.source_evidence,event.payload.entry && event.payload.entry.source_evidence].filter(Boolean);
+      [64,32].forEach(function (limit) {
+        if (bytes(JSON.stringify(event))<=4096) return;
+        sources.forEach(function (e) { Object.keys(e.utm || {}).forEach(function (k) { e.utm[k]=Array.from(e.utm[k]).slice(0,limit).join(''); }); });
+      });
+      if (bytes(JSON.stringify(event))>4096 && sources.length===2) {
+        Object.keys(sources[0].click_ids || {}).forEach(function (k) { if (sources[0].click_ids[k]===sources[1].click_ids[k]) delete sources[0].click_ids[k]; });
+      }
+      sources.forEach(function (e) {
+        Object.keys(e.click_ids || {}).reverse().forEach(function (k) { if (bytes(JSON.stringify(event))>4096) { delete e.click_ids[k]; } });
+      });
+    }
     if (bytes(JSON.stringify(event)) > 4096) return;
     owned.add(event.event_id); queue.push(event); persistQueue();
     if (!timer) timer = setTimeout(function () { timer=null; flush(false); }, 1000);
@@ -148,6 +164,7 @@
     cookie('_mgln_v3_visitor','',0); cookie('_mgln_v3_context','',0); visitor=null; session=null; persistent=false; started=false; attempt=null;
   }
   function updateConsent(input, broadcast) {
+    if (w.Magellan && typeof w.Magellan.setConsent==='function') w.Magellan.setConsent(input,false);
     var next=normalize(input), previous=consent;
     var same=previous && ['analytics','advertising','email_marketing','sms_marketing','gpc'].every(function (k) { return previous[k] === next[k]; });
     if (same) return initialized;
@@ -184,7 +201,7 @@
     if (category) { if (!['coupon_rejected','validation_failed','payment_failed','technical_error','unknown'].includes(category)) return; p.category=category; }
     record(category ? 'checkout_error_observed' : (stage==='started' ? 'checkout_started' : 'checkout_stage_observed'),p);
   }
-  w.MagellanV3={setConsent:updateConsent,whenReady:function (fn) { initialized.then(function () { if (allowed() && started) fn(); }); },registerInteraction:function (id) { if (/^[a-zA-Z0-9_.:-]{1,128}$/.test(id)) registered.add(id); },interaction:function (id, action) { if (registered.has(id) && /^[a-zA-Z0-9_.:-]{1,128}$/.test(action)) record('interaction_observed',{page:path(location.href),component_id:id,action_id:action,served_version:c.served_version}); },checkout:checkout,flush:function () { return flush(false); },stop:function () { stopped=true; purge(); }};
+  w.MagellanV3={setConsent:updateConsent,getConsent:function () { return Object.assign({},consent); },whenReady:function (fn) { initialized.then(function () { if (allowed() && started) fn(); }); },registerInteraction:function (id) { if (/^[a-zA-Z0-9_.:-]{1,128}$/.test(id)) registered.add(id); },interaction:function (id, action) { if (registered.has(id) && /^[a-zA-Z0-9_.:-]{1,128}$/.test(action)) record('interaction_observed',{page:path(location.href),component_id:id,action_id:action,served_version:c.served_version}); },checkout:checkout,flush:function () { return flush(false); },stop:function () { stopped=true; purge(); }};
   d.addEventListener('click',function (event) { var el=event.target.closest && event.target.closest('[data-magellan-component]'); if (el) w.MagellanV3.interaction(el.getAttribute('data-magellan-component'),el.getAttribute('data-magellan-action') || 'click'); });
   if (channel) channel.onmessage=function (event) { updateConsent(event.data,false); };
   w.addEventListener('magellan:consent',function (event) { updateConsent(event.detail); });

@@ -9,7 +9,7 @@ const results = [], captured = [];
 const legacyPilot = process.env.MAGELLAN_LEGACY_PILOT === '1';
 const check = (name, value) => { assert.ok(value, name); results.push({test:name,pass:true}); };
 const grant = {analytics:'granted',advertising:'granted',email_marketing:'unknown',sms_marketing:'denied',source:'test_cmp'};
-const config = {site_id:'site_fixture',installation_id:'install_fixture',environment:'test',endpoint:'https://collector.example/events',origin:'https://shop.example.co.th',plugin_version:'3.0.0-alpha.4',policy_version:'1',page_id:'42',product_id:'42',entry_type:'product',classification_version:'1',storefront:'th-TH',served_version:null};
+const config = {site_id:'site_fixture',installation_id:'install_fixture',environment:'test',endpoint:'https://collector.example/events',origin:'https://shop.example.co.th',plugin_version:'3.0.0-alpha.5',policy_version:'1',page_id:'42',product_id:'42',entry_type:'product',classification_version:'1',storefront:'th-TH',served_version:null};
 (async () => {
   const browser = await chromium.launch({headless:true,...(process.env.CHROME_EXECUTABLE ? {executablePath:process.env.CHROME_EXECUTABLE} : {})});
   try {
@@ -29,10 +29,12 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
     const page=await context.newPage(); const errors=[]; page.on('pageerror',e=>errors.push(e.message));
     await page.goto(config.origin+'/flowers/?utm_source=google&utm_medium=organic&gclid=synthetic_click&email=private@example.com');
     check('unknown consent makes no collector request',captured.length===0);
+    if (legacyPilot) check('unknown consent creates no legacy identifiers',!(await context.cookies()).some(c=>['_mgln','_mgln_cart_token'].includes(c.name)));
     check('unknown consent creates no visitor cookie',!(await context.cookies()).some(c=>c.name==='_mgln_v3_visitor_site_fixture'));
     await page.evaluate(g=>window.MagellanV3.setConsent(g),grant);
     await page.evaluate(()=>window.MagellanV3.flush());
     check('consented page/product/checkout events captured',['page_viewed','product_viewed','checkout_started'].every(t=>captured.some(e=>e.event_type===t)));
+    if (legacyPilot) { await page.evaluate(()=>delete window.MagellanConsent);await page.addScriptTag({url:config.origin+'/legacy.js'});check('deferred legacy pixel inherits current v3 consent',await page.evaluate(()=>window.Magellan.consent().analytics==='granted')); }
     const first=captured.find(e=>e.event_type==='page_viewed');
     check('query strings excluded from page identity',first.payload.path==='/flowers/' && !JSON.stringify(first).includes('private@example.com'));
     check('acknowledged browser queue cleared',await page.evaluate(()=>JSON.parse(localStorage.getItem('magellan:v3:site_fixture:queue')).length===0));
@@ -72,10 +74,8 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
     await other.close();
     if (legacyPilot) {
       const afterCookies = await context.cookies();
-      // The unchanged legacy pixel cannot set its Domain=.co.th identity cookie;
-      // preserve the cookies that actually exist and its in-page identity state.
-      check('v3 withdrawal preserves the existing legacy cart cookie',legacyCookies.some(c=>c.name==='_mgln_cart_token')&&legacyCookies.every(c=>afterCookies.some(a=>a.name===c.name&&a.value===c.value)));
-      check('v3 withdrawal preserves the legacy in-page identity',JSON.stringify(await page.evaluate(()=>window.Magellan.getCookie()))===JSON.stringify(legacyIdentity));
+      check('legacy pixel uses host-only identity cookie on co.th',legacyCookies.some(c=>c.name==='_mgln'&&c.domain==='shop.example.co.th'&&c.secure));
+      check('withdrawal removes both legacy identifiers',!afterCookies.some(c=>['_mgln','_mgln_cart_token'].includes(c.name)) && Object.keys(await page.evaluate(()=>window.Magellan.getCookie())).length===0);
     }
     check('withdrawal clears identifiers and persisted queue',!(await context.cookies()).some(c=>c.name==='_mgln_v3_visitor_site_fixture')&&await page.evaluate(()=>localStorage.getItem('magellan:v3:site_fixture:queue')===null));
     mode='accepted'; await page.evaluate(g=>window.MagellanV3.setConsent(g),grant); await page.evaluate(()=>window.MagellanV3.flush());
@@ -114,6 +114,10 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
       const beforeRepair=captured.length; await page.reload(); await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await page.evaluate(()=>window.MagellanV3.flush());
       check((Array.isArray(invalid)?'null entries':'object queue')+' recover in a real browser',captured.slice(beforeRepair).some(e=>e.event_type==='page_viewed'));
     }
+    initialConsent=grant;const large=new URLSearchParams();for(const key of ['source','medium','campaign','content','term'])large.set('utm_'+key,'ด'.repeat(128));for(const key of ['gclid','gbraid','wbraid','fbclid','msclkid','ttclid','twclid'])large.set(key,'a'.repeat(200));
+    const beforeLarge=captured.length;await page.goto(config.origin+'/large-landing?'+large);await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve)));await page.evaluate(()=>window.MagellanV3.flush());
+    for(let wait=0;wait<50&&!captured.slice(beforeLarge).some(e=>e.event_type==='page_viewed'&&e.payload.path==='/large-landing');wait++) await new Promise(resolve=>setTimeout(resolve,100));
+    const largeEvent=captured.slice(beforeLarge).find(e=>e.event_type==='page_viewed'&&e.payload.path==='/large-landing');check('large paid landing survives in real Chrome within event budget',!!largeEvent&&Buffer.byteLength(JSON.stringify(largeEvent))<=4096&&largeEvent.payload.source_evidence.click_id_types.length===7);
     check('browser resilience scenarios produce no exceptions',errors.length===0);
     const prefix=legacyPilot?'pilot-browser':'browser';
     fs.writeFileSync(root+'/tests/'+prefix+'-events.json',JSON.stringify(captured,null,2)+'\n');

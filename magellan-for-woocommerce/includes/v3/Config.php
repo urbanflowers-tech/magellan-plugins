@@ -65,6 +65,7 @@ final class Config {
             delete_option('magellan_v3_circuit');
             delete_option('magellan_v3_auth_blocked');
             Outbox::resume();
+            if (self::measurement_only() && function_exists('magellan_schedule_legacy_jobs')) { magellan_schedule_legacy_jobs(); }
             if (!self::measurement_only()) {
                 foreach (['magellan_historical_identity_sync','magellan_daily_cleanup','magellan_sync_check','magellan_health_check'] as $hook) { wp_clear_scheduled_hook($hook); }
                 if (function_exists('as_unschedule_all_actions')) {

@@ -159,6 +159,7 @@ class Magellan_Admin {
 			self::record_error( __( 'configure: signing_secret is not valid base64 of at least 16 bytes — verify backend contract.', 'magellan-for-woocommerce' ) );
 		}
 
+		if ($api_base !== '' && !\Magellan\V3\Config::endpoint($api_base)) { return new WP_Error('invalid_api_base', 'A public HTTPS API URL is required.', ['status' => 400]); }
 		update_option( self::OPT_ACCOUNT_ID,     $account_id );
 		update_option( self::OPT_SIGNING_SECRET, $secret );
 		update_option( self::OPT_CONFIGURED_AT,  time() );
@@ -240,7 +241,9 @@ class Magellan_Admin {
 		}
 
 		$endpoint = self::get_api_base() . '/bootstrap';
-		$response = wp_remote_post( $endpoint, [
+		if (!\Magellan\V3\Config::endpoint($endpoint)) { self::flash_bootstrap_result('error', 'A public HTTPS API URL is required.'); self::redirect_back(); }
+		$response = wp_safe_remote_post( $endpoint, [
+			'redirection' => 0,
 			'body'      => wp_json_encode( [
 				'account_id'    => $account_id,
 				'install_token' => $install_token,
@@ -301,6 +304,7 @@ class Magellan_Admin {
 			self::redirect_back();
 		}
 
+		if ($api_base !== '' && !\Magellan\V3\Config::endpoint($api_base)) { self::flash_bootstrap_result('error', 'Bootstrap returned an invalid API URL.'); self::redirect_back(); }
 		update_option( self::OPT_ACCOUNT_ID,     $account_id );
 		update_option( self::OPT_SIGNING_SECRET, $secret );
 		update_option( self::OPT_CONFIGURED_AT,  time() );
@@ -656,10 +660,10 @@ class Magellan_Admin {
 						?>
 					</td>
 				</tr>
-				<?php if ( ! empty( $health['plugin_status']['events_sent_24h'] ) ) : ?>
+				<?php if ( isset( $health['magellan_plugin']['events_sent_24h'] ) ) : ?>
 				<tr>
 					<th scope="row"><?php echo esc_html__( 'Events sent (24h)', 'magellan-for-woocommerce' ); ?></th>
-					<td><?php echo (int) $health['plugin_status']['events_sent_24h']; ?></td>
+					<td><?php echo (int) $health['magellan_plugin']['events_sent_24h']; ?></td>
 				</tr>
 				<?php endif; ?>
 			</table>

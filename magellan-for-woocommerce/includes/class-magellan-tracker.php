@@ -36,7 +36,7 @@ class Magellan_Tracker {
 		if ( $raw === '' ) {
 			return null;
 		}
-		$b = base64_decode( $raw, true );
+		$b = base64_decode( str_replace(' ', '+', rawurldecode($raw)), true );
 		if ( $b === false ) {
 			return null;
 		}
@@ -44,6 +44,14 @@ class Magellan_Tracker {
 		$d = json_decode( $u, true );
 		return is_array( $d ) ? $d : null;
 	}
+
+    public static function consent_state($order = null): string {
+        if ($order instanceof WC_Order) { $saved = $order->get_meta('_mgln_analytics_consent'); if (in_array($saved, ['granted','denied','unknown'], true)) { return $saved; } }
+        $raw = isset($_COOKIE['_mgln_consent']) ? wp_unslash($_COOKIE['_mgln_consent']) : '';
+        $state = is_string($raw) ? json_decode($raw, true) : null;
+        if (!is_array($state) || abs(time() - (int) ($state['updated_at'] ?? 0)) > 1800) { return 'unknown'; }
+        return in_array($state['analytics'] ?? '', ['granted','denied','unknown'], true) ? $state['analytics'] : 'unknown';
+    }
 
 	public static function stamp( $order ): void {
 		if ( ! ( $order instanceof WC_Order ) ) {
@@ -54,6 +62,10 @@ class Magellan_Tracker {
 		if ( $order->get_meta( '_mgln_attributed_at' ) ) {
 			return;
 		}
+
+		$consent = self::consent_state();
+		$order->update_meta_data('_mgln_analytics_consent', $consent);
+		if ($consent !== 'granted') { $order->update_meta_data('_mgln_attributed_at', time()); $order->save(); return; }
 
 		// Cart token — links this order back to the anonymous cart captured
 		// by magellan-cart.js. The JS mirrors its localStorage cart_token into

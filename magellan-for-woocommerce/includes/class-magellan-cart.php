@@ -72,7 +72,7 @@ class Magellan_Cart {
 	 * how many mutations fired.
 	 */
 	public static function maybe_capture_cart() {
-		if ( ! self::$cart_dirty || ! Magellan_Admin::is_configured() ) {
+		if ( ! self::$cart_dirty || ! Magellan_Admin::is_configured() || Magellan_Tracker::consent_state() !== 'granted' ) {
 			return;
 		}
 		$cart_token = self::cart_token_from_cookie();
@@ -103,7 +103,7 @@ class Magellan_Cart {
 			'identity'      => [ 'email_hash' => null, 'phone_hash' => null ],
 			'attribution'   => self::attribution_from_cookie(),
 			'cart'          => $snapshot,
-			'consent_state' => apply_filters( 'magellan_consent_state', 'granted', null ),
+			'consent_state' => apply_filters( 'magellan_consent_state', Magellan_Tracker::consent_state(), null ),
 		];
 		Magellan_Sender::schedule_cart_send( $payload );
 	}
@@ -197,6 +197,8 @@ class Magellan_Cart {
 			return new WP_REST_Response( [ 'ok' => false, 'reason' => 'not_configured' ], 200 );
 		}
 
+		if (Magellan_Tracker::consent_state() !== 'granted') { return new WP_REST_Response(['ok'=>false,'reason'=>'analytics_consent_required'], 200); }
+
 		// Rate limit per IP — 10/min, with a SEPARATE budget per route so the
 		// high-volume anonymous /cart traffic can't starve the higher-value
 		// checkout /cart-email capture (priority inversion).
@@ -256,7 +258,7 @@ class Magellan_Cart {
 				'session_count'   => isset( $attribution['session_count'] ) ? (int) $attribution['session_count'] : 1,
 			],
 			'cart' => self::resolve_cart_snapshot( $params ),
-			'consent_state' => apply_filters( 'magellan_consent_state', 'granted', null ),
+			'consent_state' => apply_filters( 'magellan_consent_state', Magellan_Tracker::consent_state(), null ),
 		];
 
 		// Forward to Magellan (signed). Same backend route for both — the
@@ -417,7 +419,7 @@ class Magellan_Cart {
 	}
 
 	private static function client_ip(): string {
-		$candidates = [ 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ];
+		$candidates = [ 'REMOTE_ADDR' ]; // Proxy headers are untrusted without an explicit trusted-proxy configuration.
 		foreach ( $candidates as $h ) {
 			if ( ! empty( $_SERVER[ $h ] ) ) {
 				$ip = sanitize_text_field( wp_unslash( $_SERVER[ $h ] ) );

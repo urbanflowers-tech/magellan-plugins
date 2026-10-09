@@ -1,5 +1,5 @@
 {
-  "checks": 173,
+  "checks": 206,
   "pass": true,
   "scope": "PHP producer event bytes match Node receiver hashes; HMAC, query canonicalization, changed bytes and expired timestamps"
 }

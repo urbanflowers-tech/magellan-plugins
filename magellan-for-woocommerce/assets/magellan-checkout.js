@@ -46,13 +46,15 @@
 		return token;
 	}
 
+	function allowed() { return window.Magellan && window.Magellan.consent && window.Magellan.consent().analytics==='granted'; }
 	async function sendEmail(email) {
+		if (!allowed()) return;
 		if (!email || email.indexOf('@') < 0) return;
 		if (lastSent && (Date.now() - lastSent) < SEND_GAP) return;
 		lastSent = Date.now();
 
 		var hash = await sha256(email);
-		if (!hash) return;
+		if (!hash || !allowed()) return;
 
 		var pixel = window.Magellan && window.Magellan.getCookie ? window.Magellan.getCookie() : {};
 		var token = getCartToken();

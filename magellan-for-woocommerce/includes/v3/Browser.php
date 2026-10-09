@@ -21,8 +21,7 @@ final class Browser {
         wp_enqueue_script('magellan-v3-pixel', MAGELLAN_PLUGIN_URL . 'assets/magellan-v3-pixel.js', [], MAGELLAN_VERSION, true);
         wp_add_inline_script('magellan-v3-pixel', 'window.MagellanV3Config=' . wp_json_encode($config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . ';', 'before');
         if (is_checkout() && !is_wc_endpoint_url('order-received')) {
-            $deps = ['magellan-v3-pixel'];
-            if ($post && has_block('woocommerce/checkout',$post)) { $deps[] = 'wp-api-fetch'; }
+            $deps = ['magellan-v3-pixel','jquery','wp-api-fetch']; // Includes checkout blocks rendered by a theme template.
             wp_enqueue_script('magellan-v3-checkout', MAGELLAN_PLUGIN_URL . 'assets/magellan-v3-checkout.js', $deps, MAGELLAN_VERSION, true);
         }
     }

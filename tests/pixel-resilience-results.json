@@ -84,6 +84,10 @@
     {
       "test": "simultaneous flush calls create only one in-flight batch",
       "pass": true
+    },
+    {
+      "test": "large paid landing retains page event within byte budget",
+      "pass": true
     }
   ]
 }

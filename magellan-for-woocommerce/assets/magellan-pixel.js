@@ -24,19 +24,12 @@
 
 	function writeCookie(name, value) {
 		var d = new Date(Date.now() + TTL_MS).toUTCString();
-		var domain = '';
-		// Use registrable domain to share cookie across www and apex
-		var host = location.hostname;
-		var parts = host.split('.');
-		if (parts.length >= 2 && host !== 'localhost') {
-			domain = '; domain=.' + parts.slice(-2).join('.');
-		}
-		document.cookie = name + '=' + value + '; expires=' + d + '; path=/; SameSite=Lax' + domain;
+		document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + d + '; path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
 	}
 
 	function decodeCookie(raw) {
 		try {
-			return JSON.parse(decodeURIComponent(atob(raw)));
+			return JSON.parse(decodeURIComponent(atob(decodeURIComponent(raw))));
 		} catch (e) {
 			return null;
 		}
@@ -87,6 +80,7 @@
 	// Read or initialize the cookie
 	// ---------------------------------------------------------
 
+	function collect(policy) {
 	var raw = readCookie(COOKIE);
 	var data = raw ? decodeCookie(raw) : null;
 	var now = Math.floor(Date.now() / 1000);
@@ -132,6 +126,7 @@
 		var cv = getParam(qs, ck);
 		if (cv) newClickIds[ck] = cv;
 	}
+	if (policy.advertising !== 'granted') { newClickIds={}; data.cids={}; }
 	var hasClickId = Object.keys(newClickIds).length > 0;
 
 	var referrer = document.referrer || '';
@@ -157,8 +152,8 @@
 		data.fct = utm.utm_content || null;
 		data.ft_kw = utm.utm_term || null;
 		data.ft = now;
-		data.furl = String(location.href).substring(0, 500);
-		data.fref = referrer ? referrer.substring(0, 300) : null;
+		data.furl = String(location.origin + location.pathname).substring(0, 500);
+		data.fref = referrer ? (function () { try { return new URL(referrer).origin; } catch (_) { return null; } })() : null;
 	}
 
 	// ---------------------------------------------------------
@@ -241,6 +236,31 @@
 	window.Magellan = {
 		v: readPluginVersion(),
 		getCookie: function () { return data; },
-		getCartToken: function () { return cartToken; }
+		getCartToken: function () { return cartToken; },
+		setConsent: apply, consent: function () { return Object.assign({}, policy); }
 	};
+    }
+    var current = {analytics:'unknown',advertising:'unknown'};
+    var consentChannel = typeof BroadcastChannel === 'function' ? new BroadcastChannel('magellan:legacy:privacy') : null;
+    function purge() {
+        ['_mgln','_mgln_cart_token','_mgln_consent'].forEach(function (name) {
+            document.cookie=name+'=; Max-Age=0; Path=/; SameSite=Lax';
+            // Remove cookies set by the old registrable-domain approximation as well.
+            var labels=location.hostname.split('.');
+            while (labels.length>1) { document.cookie=name+'=; Max-Age=0; Path=/; Domain=.'+labels.join('.'); labels.shift(); }
+        });
+        try { localStorage.removeItem('_mgln_cart_token'); } catch (_) {}
+        window.Magellan={getCookie:function () { return {}; },getCartToken:function () { return null; },setConsent:apply,consent:function () { return Object.assign({},current); }};
+    }
+    function apply(input, broadcast) {
+        input=input || {};
+        current={analytics:input.analytics==='granted'?'granted':(input.analytics==='denied'?'denied':'unknown'),advertising:input.advertising==='granted' && navigator.globalPrivacyControl!==true?'granted':'denied',updated_at:Math.floor(Date.now()/1000)};
+        if (current.analytics==='granted') { collect(current); document.cookie='_mgln_consent='+encodeURIComponent(JSON.stringify(current))+'; Max-Age=1800; Path=/; SameSite=Lax'+(location.protocol==='https:'?'; Secure':''); } else { purge(); }
+        if (broadcast!==false && consentChannel) consentChannel.postMessage(current);
+    }
+    if (consentChannel) consentChannel.onmessage=function (event) { apply(event.data,false); };
+    window.addEventListener('magellan:consent',function (event) { apply(event.detail); });
+    function cookieConsent() { var b=window.Cookiebot; if (b && b.hasResponse) apply({analytics:b.consent.statistics?'granted':'denied',advertising:b.consent.marketing?'granted':'denied'}); }
+    ['CookiebotOnConsentReady','CookiebotOnAccept','CookiebotOnDecline'].forEach(function (name) { window.addEventListener(name,cookieConsent); });
+    apply(window.MagellanV3 && window.MagellanV3.getConsent ? window.MagellanV3.getConsent() : (window.MagellanConsent || {}),false); cookieConsent();
 })();
