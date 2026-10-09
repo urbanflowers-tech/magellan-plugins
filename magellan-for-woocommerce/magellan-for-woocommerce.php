@@ -3,7 +3,7 @@
  * Plugin Name:       Magellan for WooCommerce
  * Plugin URI:        https://magellan.app
  * Description:       Consent-controlled website measurement and durable WooCommerce evidence delivery to Magellan.
- * Version:           3.0.0-alpha.3
+ * Version:           3.0.0-alpha.4
  * Author:            Magellan
  * Author URI:        https://magellan.app
  * License:           GPL-2.0+
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Constants
 // ---------------------------------------------------------------------
 
-define( 'MAGELLAN_VERSION',            '3.0.0-alpha.3' );
+define( 'MAGELLAN_VERSION',            '3.0.0-alpha.4' );
 define( 'MAGELLAN_PLUGIN_FILE',        __FILE__ );
 define( 'MAGELLAN_PLUGIN_DIR',         plugin_dir_path( __FILE__ ) );
 define( 'MAGELLAN_PLUGIN_URL',         plugin_dir_url( __FILE__ ) );
@@ -123,7 +123,7 @@ add_action(
 		}
 
 		require_once MAGELLAN_PLUGIN_DIR . 'includes/v3/bootstrap.php';
-		if (\Magellan\V3\Config::active()) { return; }
+		if (!\Magellan\V3\Config::legacy_enabled()) { return; }
 
 		$includes = [
 			'class-magellan-admin',

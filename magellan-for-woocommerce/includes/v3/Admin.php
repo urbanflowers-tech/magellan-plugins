@@ -35,7 +35,7 @@ final class Admin {
     }
     public static function status(): array {
         $c = Config::get();
-        return ['connected' => Config::ready(), 'mode' => Config::active() ? 'v3' : 'legacy_or_unconfigured', 'site_id' => $c['site_id'] ?? null, 'installation_id' => $c['installation_id'] ?? null, 'environment' => $c['environment'] ?? null, 'origin' => Config::origin(), 'analytics_enabled' => Config::analytics(), 'tracking_started_at' => $c['tracking_started_at'] ?? null, 'queue' => Outbox::stats(), 'reporting' => ['state' => 'backend_verification_required', 'note' => 'A receipt proves durable intake, not report application.'], 'capabilities' => self::capabilities()];
+        return ['connected' => Config::ready(), 'mode' => Config::active() ? (Config::measurement_only() ? 'v3_measurement_with_legacy' : 'v3') : 'legacy_or_unconfigured', 'collection_mode' => $c['collection_mode'] ?? 'full', 'legacy_enabled' => Config::legacy_enabled(), 'site_id' => $c['site_id'] ?? null, 'installation_id' => $c['installation_id'] ?? null, 'environment' => $c['environment'] ?? null, 'origin' => Config::origin(), 'analytics_enabled' => Config::analytics(), 'tracking_started_at' => $c['tracking_started_at'] ?? null, 'queue' => Outbox::stats(), 'reporting' => ['state' => 'backend_verification_required', 'note' => 'A receipt proves durable intake, not report application.'], 'capabilities' => self::capabilities()];
     }
     public static function replay($request) {
         global $wpdb; $id = Protocol::id($request['event_id']);

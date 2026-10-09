@@ -114,24 +114,24 @@
   },
   {
     "schema_version": "3.0.0",
-    "plugin_version": "3.0.0-alpha.2",
-    "event_id": "21e4768c-6d50-4f03-8842-0947af7ef4ea",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "4d8c78db-3f39-4697-9985-35ed56e156cd",
     "event_type": "order_snapshot",
     "site_id": "site_fixture",
     "installation_id": "install_fixture",
     "environment": "test",
     "producer": "wordpress",
     "evidence_class": "source_fact",
-    "occurred_at": "2026-10-09T01:40:10+00:00",
-    "captured_at": "2026-10-09T01:40:10+00:00",
-    "visitor_id": "76a9bafb-1ef8-45ba-89ce-92ecf18955e5",
-    "session_id": "e4cedd5b-7896-431a-b530-a6b9d048f412",
-    "cart_id": "01208ab1-e2a6-4d5e-b45f-9aa6a43215c0",
+    "occurred_at": "2026-10-09T03:56:48+00:00",
+    "captured_at": "2026-10-09T03:56:48+00:00",
+    "visitor_id": "fa6fda07-cf6e-4160-9a3c-7e0feafededd",
+    "session_id": "e085f61b-71b2-455b-9f94-2e12ee530fcd",
+    "cart_id": "432b87d3-9af7-4f6e-bd6c-aa6e1d551539",
     "entity": {
       "source_system": "woocommerce",
       "type": "order",
-      "id": "22",
-      "revision": "698d876214a947afdff2d66330be9c5c50432b6e442a86741cc0109bbfe02cf8"
+      "id": "154",
+      "revision": "e0808720ece360a861b21bac0098420990417d3cc18ca7c85d9aff09f6c14169"
     },
     "origin_system": "woocommerce",
     "operation_id": null,
@@ -143,17 +143,17 @@
       "email_marketing": "unknown",
       "sms_marketing": "unknown",
       "source": "browser_asserted:fixture",
-      "effective_at": "2026-10-09T01:40:10+00:00",
+      "effective_at": "2026-10-09T03:56:48+00:00",
       "policy_version": "unknown",
       "epoch": 0,
       "gpc": false
     },
     "payload": {
       "source_system": "woocommerce",
-      "order_id": "22",
+      "order_id": "154",
       "status": "pending",
-      "created_at": "2026-10-09T01:40:10+00:00",
-      "modified_at": "2026-10-09T01:40:10+00:00",
+      "created_at": "2026-10-09T03:56:48+00:00",
+      "modified_at": "2026-10-09T03:56:48+00:00",
       "currency": "THB",
       "exponent": 2,
       "amounts": {
@@ -185,9 +185,9 @@
       },
       "lines": [
         {
-          "line_id": "57",
+          "line_id": "575",
           "refunded_line_id": null,
-          "product_id": "21",
+          "product_id": "153",
           "variation_id": null,
           "sku": "",
           "quantity": "2",
@@ -215,16 +215,16 @@
       "transaction_id": null,
       "paid_at": null,
       "checkout_context": {
-        "visitor_id": "76a9bafb-1ef8-45ba-89ce-92ecf18955e5",
-        "session_id": "e4cedd5b-7896-431a-b530-a6b9d048f412",
-        "cart_id": "01208ab1-e2a6-4d5e-b45f-9aa6a43215c0",
+        "visitor_id": "fa6fda07-cf6e-4160-9a3c-7e0feafededd",
+        "session_id": "e085f61b-71b2-455b-9f94-2e12ee530fcd",
+        "cart_id": "432b87d3-9af7-4f6e-bd6c-aa6e1d551539",
         "consent": {
           "analytics": "granted",
           "advertising": "unknown",
           "email_marketing": "unknown",
           "sms_marketing": "unknown",
           "source": "browser_asserted:fixture",
-          "effective_at": "2026-10-09T01:40:10+00:00",
+          "effective_at": "2026-10-09T03:56:48+00:00",
           "policy_version": "unknown",
           "epoch": 0,
           "gpc": false
@@ -248,8 +248,8 @@
       "subscriptions": {
         "adapter": "unavailable"
       },
-      "source_revision": "698d876214a947afdff2d66330be9c5c50432b6e442a86741cc0109bbfe02cf8",
-      "snapshot_id": "529101bd-55d4-440c-9b63-250c2c46002c",
+      "source_revision": "e0808720ece360a861b21bac0098420990417d3cc18ca7c85d9aff09f6c14169",
+      "snapshot_id": "0c25aae8-eed7-4d19-a1a4-eb519680334a",
       "pages": 1,
       "page": 1
     }

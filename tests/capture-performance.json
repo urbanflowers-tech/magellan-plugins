@@ -1,6 +1,6 @@
 {
     "fixture": "100 small event captures, isolated local MySQL; not checkout\/Core Web Vitals certification",
-    "p50_ms": 2.7167797088623047,
-    "p95_ms": 11.040925979614258,
-    "max_ms": 46.94795608520508
+    "p50_ms": 2.5489330291748047,
+    "p95_ms": 3.8299560546875,
+    "max_ms": 27.866125106811523
 }

@@ -3,7 +3,7 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),cryp
 const root=path.resolve(__dirname,'..'),source=fs.readFileSync(root+'/magellan-for-woocommerce/assets/magellan-v3-pixel.js','utf8');
 const results=[];
 const id=()=>crypto.randomUUID();
-const config={site_id:'resilience_site',installation_id:'current_install',environment:'test',endpoint:'https://collector.example/events',origin:'https://shop.example',plugin_version:'3.0.0-alpha.3',policy_version:'1',page_id:'42',product_id:null,entry_type:'content',classification_version:'1',storefront:'en',served_version:null};
+const config={site_id:'resilience_site',installation_id:'current_install',environment:'test',endpoint:'https://collector.example/events',origin:'https://shop.example',plugin_version:'3.0.0-alpha.4',policy_version:'1',page_id:'42',product_id:null,entry_type:'content',classification_version:'1',storefront:'en',served_version:null};
 const grant={analytics:'granted',advertising:'granted',email_marketing:'unknown',sms_marketing:'unknown',source:'fixture_cmp',epoch:10};
 function state(){return {storage:new Map(),cookies:new Map(),locks:new Map()};}
 function tab(shared,options={}){

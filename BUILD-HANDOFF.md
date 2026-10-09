@@ -1,12 +1,12 @@
 # Magellan WordPress plugin v3 — build and backend handoff
 
-**Build:** 3.0.0-alpha.3 · **Protocol/schema:** 3 / 3.0.0 · **Date:** 9 October 2026
+**Build:** 3.0.0-alpha.4 · **Protocol/schema:** 3 / 3.0.0 · **Date:** 9 October 2026
 
-This is an installable development candidate built from the existing `magellan-for-woocommerce` 2.5.0 repository. Alpha.1 was installed on the verified Urbanflowers staging site and passed initial installation checks and a sampled cart/checkout-entry journey. V3 remains disconnected pending the Magellan receiver; those hosted checks exercised legacy compatibility mode. Alpha.2 fixes a reproduced express-checkout attribution gap. Alpha.3 fixes six reproduced browser resilience defects: retained advertising evidence after consent denial, old-installation queue reimport, object-format queue storage, null queue entries, invalid receipt timestamps and overlapping sends. No production deployment, Magellan backend deployment, GitHub push or automatic-update release has been performed.
+This is a local candidate for a measurement-only live pilot. Alpha.4 has not been installed or activated on either Urbanflowers site. The previously installed staging candidate is alpha.3, still disconnected in the last verified staging evidence. No backend deployment, production update, GitHub push or automatic-update release was performed.
 
-Urbanflowers' express-order handler creates a WooCommerce order directly and emits `woocommerce_checkout_order_processed`, bypassing the usual create/created checkout hooks. Alpha.2 observes that processed hook, freezes consented context once and deduplicates the normal path where both hooks fire. The actual merchant PHP handler was exercised with a synthetic provider object in a disposable installation, with HTTP and mail disabled. This does not certify a real Apple Pay, Google Pay or Stripe transaction.
+The new optional `collection_mode: "measurement_only"` keeps the existing legacy sender, pixel, connection settings, cron jobs and queued order work running. The paired backend stores v3 observations and links to already imported orders; it skips commerce imports, WooCommerce API fetches and operational cart projection. Both sides must agree on the mode during the signed challenge. A mismatched or older receiver cannot silently activate this mode.
 
-Alpha.3 is now active on Urbanflowers staging in legacy compatibility mode. All 24 installed files match its ZIP, 11 installation/access checks passed, both homepages respond successfully, and both hosted v3 scripts match the build. An alpha.2 backup was made before replacement. This verifies installation, not an active v3 measurement connection.
+The existing full mode remains compatible and replaces the legacy producer as before. This pilot does not assert that every planned report or the whole storefront is certified. Broader backend tests have known failures reproduced on the unchanged parent revision; the live release still requires the repository's exact-candidate review and release controls.
 
 Magellan remains the autonomous operator and owner of inventory, canonical orders, payments and finance. The plugin collects channel evidence. It neither reserves stock nor books revenue, settles payments, computes attribution, sends advertisements, or edits storefront pages autonomously.
 
@@ -24,13 +24,13 @@ Magellan remains the autonomous operator and owner of inventory, canonical order
 | Diagnostics | Connection, capture, receipts, runner execution, backlog, gaps and recent errors are separate; a receipt does not claim report application |
 | Shared contracts | JSON Schemas, valid/invalid fixtures, PHP/Node signature vectors, receiver-side signature reference and captured-event byte/hash fixtures |
 
-The previous producer remains available until the v3 connection challenge succeeds. Once v3 is active, the old producer and browser scripts are not initialized. Existing legacy connection settings and `_mgln_*` history are preserved for a coordinated rollback. V2/v3 normalization and downstream deduplication must exist in Magellan before migration.
+In full mode, the previous producer remains available until the v3 connection challenge succeeds, then its old sender and browser scripts are not initialized. In measurement-only mode, both remain available and the backend does not run a second commerce import. Existing legacy connection settings and `_mgln_*` history are preserved for a coordinated rollback. V2/v3 normalization and downstream deduplication must exist in Magellan before migration.
 
 ## Magellan work required before connecting
 
 The existing `/pixel/event` receiver accepts the older commerce contract. It is not a receiver for these v3 events. The new plugin will refuse to claim Connected until the backend confirms the v3 contract through a signed challenge.
 
-Implement these independently configured endpoints, retaining existing v2 ingestion:
+The paired local backend implements these endpoints while retaining v2 ingestion. Deployment and a real website-to-report connection remain unverified:
 
 1. **Signed challenge** — validate the signature and credential binding, then return the exact challenge, site, installation and environment plus `schema_version: "3.0.0"` and `durable_intake_ready: true`. Return true only when event intake actually exists. This is an additional setup endpoint; it is not an analytics event.
 2. **Signed WordPress event intake** — validate the raw request signature, scope and every event, commit a durable inbox and processing obligation, then return per-event receipts. Route source evidence into existing Magellan order/payment/refund/cart services under their ownership rules.
@@ -49,6 +49,7 @@ An authorized WordPress administrator or Application Password integration POSTs 
   "site_id": "site_example",
   "installation_id": "install_example",
   "environment": "test",
+  "collection_mode": "measurement_only",
   "origin": "https://store.example.com",
   "events_url": "https://api.example.com/api/v1/wordpress/events",
   "collect_url": "https://collect.example.com/api/v1/collect/events",
@@ -62,7 +63,7 @@ An authorized WordPress administrator or Application Password integration POSTs 
 
 These are illustrative addresses and an intentionally invalid placeholder key. The backend must issue the real configuration; the plugin does not create a tenant from an account ID. Never put the signing key in JavaScript or shared page HTML. Settings/configuration access currently requires `manage_options`; routine event push needs no WordPress administrator session.
 
-The challenge body contains `schema_version`, `installation_id`, `site_id`, `environment`, `origin` and a random `challenge`. Its response repeats those binding fields and the challenge. The API challenge and events URLs must share an HTTPS origin; a dedicated HTTPS browser collector may use another origin. Redirects are disabled. Production storefront origins must be HTTPS. Changing `home_url` or the WordPress environment pauses sending until reconnect.
+The challenge body contains `schema_version`, `installation_id`, `site_id`, `environment`, `origin`, `collection_mode` and a random `challenge`. Its response repeats those binding fields and the challenge. Older full-mode responses may omit the mode; a measurement-only response must confirm it explicitly. The API challenge and events URLs must share an HTTPS origin; a dedicated HTTPS browser collector may use another origin. Redirects are disabled. Production storefront origins must be HTTPS. Changing `home_url` or the WordPress environment pauses sending until reconnect.
 
 ## Wire contract
 
@@ -154,24 +155,31 @@ The WordPress eraser removes local order analytics links and queues a privacy re
 
 ## Local verification and remaining release gates
 
-Current verification is listed below. The server implementation is unchanged from alpha.2, so the four WordPress/WooCommerce integration runs are retained evidence rather than newly repeated runs. The changed browser code was rerun in Chrome and in deterministic browser-API fixtures.
+The changed activation path was tested on both WordPress/WooCommerce pairs in both storage modes. A fresh process verified that the configured legacy sender and v3 capture hooks coexist. Browser coexistence used both shipped pixels, synthetic data and intercepted collector responses.
 
 | Check | Result |
 |---|---|
-| WordPress 7.1.3 / WooCommerce 11.2.0 | 51 integration plus 10 merchant express-checkout checks in each of legacy and HPOS storage (alpha.2 server implementation) |
-| WordPress 6.9.4 / WooCommerce 9.9.5 (staging software versions) | The same 51 integration plus 10 express-checkout checks in each storage mode (alpha.2 server implementation) |
-| Isolated Chrome browser | 26 checks passed on alpha.3, including real-browser consent/storage regressions |
-| Browser resilience fixtures | 21 checks passed on alpha.3; queue/batch bounds, partial receipts, retry ceiling, beacon retention and concurrent sends |
-| Cross-language contracts | 155 checks |
-| JSON Schemas | 188 valid event fixtures accepted; 3 invalid fixtures rejected |
-| PHP syntax | 18 files clean |
+| WordPress 7.1.3 / WooCommerce 11.2.0 | 51 integration + 10 express-checkout + 9 pilot checks, plus a fresh-process coexistence check, in each storage mode |
+| WordPress 6.9.4 / WooCommerce 9.9.5 (staging software versions) | The same 51 + 10 + 9 checks and fresh-process check in each storage mode |
+| Isolated Chrome with legacy and v3 pixels | 28 checks passed, including preserved legacy cart cookie and in-page identity |
+| Browser resilience fixtures | 21 checks passed on alpha.4; queue/batch bounds, partial receipts, retry ceiling, beacon retention and concurrent sends |
+| Cross-language contracts | 173 checks |
+| JSON Schemas | 252 valid event fixtures accepted; 3 invalid fixtures rejected |
+| PHP syntax | 18 plugin files and 3 PHP test files clean |
+| Paired backend focused suites | 53 passed, including 18 real-PostgreSQL cases; no skipped DB tier |
+| Backend migration | Fresh creation and upgrade from parent passed; existing installations remain full; invalid mode rejected |
+| Broader backend checks | 421 passed, 9 failed, 0 skipped; all 9 failures reproduced on the unchanged parent (10 failed there) |
 
-Both isolated WordPress/WooCommerce pairs used PHP 8.2.29 and MySQL 8.4.0. Hosted staging uses PHP 8.2.34 and MariaDB 10.11.18; matching the WordPress/WooCommerce versions does not reproduce the entire host. Browser checks ran on Chrome 155.0.8059.40. The core browser script is 5,592 bytes gzipped; its checkout adapter is 645 bytes gzipped. The retained alpha.2 local fixture of 100 small event captures measured 11.04 ms at p95; this is a local capture measurement, not a checkout or Core Web Vitals benchmark or a production performance gate.
+Both isolated WordPress/WooCommerce pairs used PHP 8.2.29 and MySQL 8.4.0. Hosted staging uses PHP 8.2.34 and MariaDB 10.11.18; matching the WordPress/WooCommerce versions does not reproduce the entire host. Browser checks ran on Chrome 155.0.8059.40. The core browser script is 5,592 bytes gzipped; its checkout adapter is 645 bytes gzipped. The latest isolated fixture of 100 small captures measured 3.83 ms at p95. This is not a checkout or Core Web Vitals benchmark. Backend typecheck/build passed; non-mutating lint reported zero errors and 456 warnings. The broader backend failures remain release-review issues, not passes.
 
 The source bundle contains the executable tests and their saved results. PHP integration tests use real WordPress, WooCommerce, MySQL and Action Scheduler, with simulated Magellan HTTP outcomes. Browser tests use a real isolated Chrome context with an intercepted collector. Signature/schema tests join these fixtures across languages.
 
 This candidate does not certify Urbanflowers' theme, custom cart, consent manager, Omise/other gateways, caching/minification, subscription extension, multi-currency extension or multisite network activation. Storefront-specific staging, actual backend durable ingestion/report application, recovery through a real network outage, consent/erasure completion, checkout/Core Web Vitals performance, migration/rollback and production canary remain later gates. No 10,000-store capacity claim is made.
 
 Order, cart and refund snapshots are paginated; an individually oversized source event is visibly blocked for recovery. No historical identity import, generic customer hash graph, Web Vitals, experiments, Site Model, autonomous publishing, recovery messages or ad-destination dispatch is enabled. Those capabilities are visibly false rather than empty success stubs. This implements the measurement-plugin build, not the backend reporting product or the later optional modules.
+
+Recovery: disable measurement-only installations before rolling the backend back to a version that does not understand the mode. Keep the additive mode column; the migration refuses an automatic downgrade that would remove this boundary. Restoring the old plugin does not erase its v3 queue or alter canonical orders. The complete rollback procedure must be reviewed for the actual environment.
+
+Legacy coexistence limitation: the unchanged legacy pixel attempts a Domain=.co.th cookie on a co.th storefront; the browser rejects that identity cookie. Its host-only cart cookie and in-page identity remain intact. The v3 pixel has separately verified host-only cookies. This pilot does not claim to repair or certify every legacy tracking behavior.
 
 Relevant primary integration references: [WooCommerce hook compatibility](https://developer.woocommerce.com/docs/block-development/reference/hooks/hook-alternatives/), [Action Scheduler API](https://actionscheduler.org/api/), and [Cookiebot API](https://www.cookiebot.com/en/developer/).

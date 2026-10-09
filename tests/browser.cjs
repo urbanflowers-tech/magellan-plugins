@@ -6,9 +6,10 @@ const crypto = require('node:crypto');
 const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '..');
 const results = [], captured = [];
+const legacyPilot = process.env.MAGELLAN_LEGACY_PILOT === '1';
 const check = (name, value) => { assert.ok(value, name); results.push({test:name,pass:true}); };
 const grant = {analytics:'granted',advertising:'granted',email_marketing:'unknown',sms_marketing:'denied',source:'test_cmp'};
-const config = {site_id:'site_fixture',installation_id:'install_fixture',environment:'test',endpoint:'https://collector.example/events',origin:'https://shop.example.co.th',plugin_version:'3.0.0-alpha.3',policy_version:'1',page_id:'42',product_id:'42',entry_type:'product',classification_version:'1',storefront:'th-TH',served_version:null};
+const config = {site_id:'site_fixture',installation_id:'install_fixture',environment:'test',endpoint:'https://collector.example/events',origin:'https://shop.example.co.th',plugin_version:'3.0.0-alpha.4',policy_version:'1',page_id:'42',product_id:'42',entry_type:'product',classification_version:'1',storefront:'th-TH',served_version:null};
 (async () => {
   const browser = await chromium.launch({headless:true,...(process.env.CHROME_EXECUTABLE ? {executablePath:process.env.CHROME_EXECUTABLE} : {})});
   try {
@@ -21,8 +22,9 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
         return route.fulfill({status:202,headers:{'Access-Control-Allow-Origin':config.origin},contentType:'application/json',body:JSON.stringify({results:data.events.map(e=>({event_id:e.event_id,body_hash:mode==='wrong_hash' ? '0'.repeat(64):crypto.createHash('sha256').update(JSON.stringify(e)).digest('hex'),status:'accepted',receipt_id:'receipt_'+e.event_id,received_at:new Date().toISOString(),code:null}))})});
       }
       if (url.endsWith('/pixel.js')) return route.fulfill({contentType:'application/javascript',body:fs.readFileSync(root+'/magellan-for-woocommerce/assets/magellan-v3-pixel.js','utf8')});
+      if (url.endsWith('/legacy.js')) return route.fulfill({contentType:'application/javascript',body:fs.readFileSync(root+'/magellan-for-woocommerce/assets/magellan-pixel.js','utf8')});
       if (url.endsWith('/checkout.js')) return route.fulfill({contentType:'application/javascript',body:fs.readFileSync(root+'/magellan-for-woocommerce/assets/magellan-v3-checkout.js','utf8')});
-      return route.fulfill({contentType:'text/html',body:'<!doctype html><html><head><title>Magellan isolated fixture</title></head><body><button data-magellan-component="hero" data-magellan-action="shop">Shop</button><form class="checkout"></form><script>window.MagellanV3Config='+JSON.stringify(config)+';'+(initialConsent?'window.MagellanConsent='+JSON.stringify(initialConsent)+';':'')+'</script><script src="/pixel.js"></script><script src="/checkout.js"></script></body></html>'});
+      return route.fulfill({contentType:'text/html',body:'<!doctype html><html><head><title>Magellan isolated fixture</title><meta name="magellan-account" content="fixture"></head><body><button data-magellan-component="hero" data-magellan-action="shop">Shop</button><form class="checkout"></form><script>window.MagellanV3Config='+JSON.stringify(config)+';'+(initialConsent?'window.MagellanConsent='+JSON.stringify(initialConsent)+';':'')+'</script>'+(legacyPilot?'<script src="/legacy.js"></script>':'')+'<script src="/pixel.js"></script><script src="/checkout.js"></script></body></html>'});
     });
     const page=await context.newPage(); const errors=[]; page.on('pageerror',e=>errors.push(e.message));
     await page.goto(config.origin+'/flowers/?utm_source=google&utm_medium=organic&gclid=synthetic_click&email=private@example.com');
@@ -59,6 +61,8 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
     mode='wrong_hash';
     await page.evaluate(()=>window.MagellanV3.interaction('hero','shop')); await page.evaluate(()=>window.MagellanV3.flush());
     check('wrong receipt hash retains browser event',await page.evaluate(()=>JSON.parse(localStorage.getItem('magellan:v3:site_fixture:queue')).length>0));
+    const legacyCookies = (await context.cookies()).filter(c=>['_mgln','_mgln_cart_token'].includes(c.name));
+    const legacyIdentity = legacyPilot ? await page.evaluate(()=>window.Magellan.getCookie()) : null;
     await page.evaluate(()=>window.MagellanV3.setConsent({analytics:'denied',source:'test_cmp'}));
     await other.waitForFunction(()=>localStorage.getItem('magellan:v3:site_fixture:queue')===null);
     const atRevoke=captured.length;
@@ -66,6 +70,13 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
     await other.evaluate(()=>window.MagellanV3.flush());
     check('withdrawal stops collection in the second tab',!captured.slice(atRevoke).some(e=>e.event_type==='interaction_observed'));
     await other.close();
+    if (legacyPilot) {
+      const afterCookies = await context.cookies();
+      // The unchanged legacy pixel cannot set its Domain=.co.th identity cookie;
+      // preserve the cookies that actually exist and its in-page identity state.
+      check('v3 withdrawal preserves the existing legacy cart cookie',legacyCookies.some(c=>c.name==='_mgln_cart_token')&&legacyCookies.every(c=>afterCookies.some(a=>a.name===c.name&&a.value===c.value)));
+      check('v3 withdrawal preserves the legacy in-page identity',JSON.stringify(await page.evaluate(()=>window.Magellan.getCookie()))===JSON.stringify(legacyIdentity));
+    }
     check('withdrawal clears identifiers and persisted queue',!(await context.cookies()).some(c=>c.name==='_mgln_v3_visitor_site_fixture')&&await page.evaluate(()=>localStorage.getItem('magellan:v3:site_fixture:queue')===null));
     mode='accepted'; await page.evaluate(g=>window.MagellanV3.setConsent(g),grant); await page.evaluate(()=>window.MagellanV3.flush());
     await page.waitForFunction(()=>JSON.parse(localStorage.getItem('magellan:v3:site_fixture:queue') || '[]').length===0);
@@ -104,8 +115,9 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
       check((Array.isArray(invalid)?'null entries':'object queue')+' recover in a real browser',captured.slice(beforeRepair).some(e=>e.event_type==='page_viewed'));
     }
     check('browser resilience scenarios produce no exceptions',errors.length===0);
-    fs.writeFileSync(root+'/tests/browser-events.json',JSON.stringify(captured,null,2)+'\n');
-    fs.writeFileSync(root+'/tests/browser-results.json',JSON.stringify({browser:browser.version(),transport:'intercepted collector responses; real isolated Chrome context',results},null,2)+'\n');
+    const prefix=legacyPilot?'pilot-browser':'browser';
+    fs.writeFileSync(root+'/tests/'+prefix+'-events.json',JSON.stringify(captured,null,2)+'\n');
+    fs.writeFileSync(root+'/tests/'+prefix+'-results.json',JSON.stringify({browser:browser.version(),transport:'intercepted collector responses; real isolated Chrome context',legacy_pixel_loaded:legacyPilot,results},null,2)+'\n');
     console.log(results.length+' browser checks passed');
   } finally { await browser.close(); }
 })().catch(e=>{console.error(e);process.exitCode=1;});

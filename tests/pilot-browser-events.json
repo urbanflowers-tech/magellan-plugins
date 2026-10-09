@@ -1,0 +1,2409 @@
+[
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "c1ad3513-f2e7-42d8-9f32-9740c8a2368f",
+    "event_type": "page_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.110Z",
+    "captured_at": "2026-10-09T03:53:13.110Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 1,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.105Z",
+      "policy_version": "1",
+      "epoch": 1791517993105,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "51de712d-f702-4599-8b62-37e4be7734aa",
+      "path": "/flowers/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {
+          "source": "google",
+          "medium": "organic"
+        },
+        "click_ids": {
+          "gclid": "synthetic_click"
+        },
+        "click_id_types": [
+          "gclid"
+        ],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/flowers/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {
+            "source": "google",
+            "medium": "organic"
+          },
+          "click_ids": {
+            "gclid": "synthetic_click"
+          },
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:13.108Z",
+      "session_aliases": [],
+      "stream_id": "cd905903-555d-4856-8940-5a54e35bbf39"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "7f8630d6-74d7-44f4-95e0-a1203fe0995a",
+    "event_type": "product_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.110Z",
+    "captured_at": "2026-10-09T03:53:13.110Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 2,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.105Z",
+      "policy_version": "1",
+      "epoch": 1791517993105,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "51de712d-f702-4599-8b62-37e4be7734aa",
+      "path": "/flowers/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {
+          "source": "google",
+          "medium": "organic"
+        },
+        "click_ids": {
+          "gclid": "synthetic_click"
+        },
+        "click_id_types": [
+          "gclid"
+        ],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/flowers/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {
+            "source": "google",
+            "medium": "organic"
+          },
+          "click_ids": {
+            "gclid": "synthetic_click"
+          },
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:13.108Z",
+      "session_aliases": [],
+      "stream_id": "cd905903-555d-4856-8940-5a54e35bbf39"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "86875f7a-4167-4f62-b7c4-a8d0443bd416",
+    "event_type": "checkout_started",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.110Z",
+    "captured_at": "2026-10-09T03:53:13.110Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 3,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.105Z",
+      "policy_version": "1",
+      "epoch": 1791517993105,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/flowers/",
+      "checkout_attempt_id": "eab5a545-567b-4599-a6e7-e6d9c254717a",
+      "adapter": "woocommerce-checkout-1",
+      "stage": "started"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "2bed9fbb-1ddb-4dff-b9c5-bcba8935d8dd",
+    "event_type": "page_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.177Z",
+    "captured_at": "2026-10-09T03:53:13.177Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 1,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.173Z",
+      "policy_version": "1",
+      "epoch": 1791517993173,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "ac193747-aa5c-40f6-8363-102a443e5aa6",
+      "path": "/second/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {
+          "source": "facebook",
+          "medium": "cpc"
+        },
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/flowers/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {
+            "source": "google",
+            "medium": "organic"
+          },
+          "click_ids": {
+            "gclid": "synthetic_click"
+          },
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:13.108Z",
+      "session_aliases": [],
+      "stream_id": "d5753da3-a223-411d-9418-131325579d6e"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "03fda053-8415-478e-91cf-295124018972",
+    "event_type": "product_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.177Z",
+    "captured_at": "2026-10-09T03:53:13.177Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 2,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.173Z",
+      "policy_version": "1",
+      "epoch": 1791517993173,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "ac193747-aa5c-40f6-8363-102a443e5aa6",
+      "path": "/second/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {
+          "source": "facebook",
+          "medium": "cpc"
+        },
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/flowers/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {
+            "source": "google",
+            "medium": "organic"
+          },
+          "click_ids": {
+            "gclid": "synthetic_click"
+          },
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:13.108Z",
+      "session_aliases": [],
+      "stream_id": "d5753da3-a223-411d-9418-131325579d6e"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "30acedf1-566c-4238-a531-f76d28c02b19",
+    "event_type": "checkout_started",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.178Z",
+    "captured_at": "2026-10-09T03:53:13.178Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 3,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.173Z",
+      "policy_version": "1",
+      "epoch": 1791517993173,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/second/",
+      "checkout_attempt_id": "6065f582-dafc-422c-ba15-c168b7e7fafd",
+      "adapter": "woocommerce-checkout-1",
+      "stage": "started"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "6f80c174-ff9d-4431-b78b-307521736b8d",
+    "event_type": "page_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.295Z",
+    "captured_at": "2026-10-09T03:53:13.295Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 1,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.271Z",
+      "policy_version": "1",
+      "epoch": 1791517993271,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "6a1f5a8b-7f5f-4b3d-b795-4ace384538fa",
+      "path": "/other",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/flowers/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {
+            "source": "google",
+            "medium": "organic"
+          },
+          "click_ids": {
+            "gclid": "synthetic_click"
+          },
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:13.108Z",
+      "session_aliases": [],
+      "stream_id": "e0672d80-822f-434d-809c-7ca1a6aed8d2"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "70549526-94f1-4bc6-9dc6-16c15ba1de1f",
+    "event_type": "product_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.295Z",
+    "captured_at": "2026-10-09T03:53:13.295Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 2,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.271Z",
+      "policy_version": "1",
+      "epoch": 1791517993271,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "6a1f5a8b-7f5f-4b3d-b795-4ace384538fa",
+      "path": "/other",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/flowers/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {
+            "source": "google",
+            "medium": "organic"
+          },
+          "click_ids": {
+            "gclid": "synthetic_click"
+          },
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:13.108Z",
+      "session_aliases": [],
+      "stream_id": "e0672d80-822f-434d-809c-7ca1a6aed8d2"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "a4fc18e2-dfa5-4103-bc3b-b740cc470a7d",
+    "event_type": "checkout_started",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.296Z",
+    "captured_at": "2026-10-09T03:53:13.296Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 3,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.271Z",
+      "policy_version": "1",
+      "epoch": 1791517993271,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/other",
+      "checkout_attempt_id": "b8b5dd30-96bf-4aad-8997-98c7e79560d0",
+      "adapter": "woocommerce-checkout-1",
+      "stage": "started"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "ff3cfc12-a295-4b20-a010-523ac96ddaba",
+    "event_type": "interaction_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.312Z",
+    "captured_at": "2026-10-09T03:53:13.312Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 4,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.271Z",
+      "policy_version": "1",
+      "epoch": 1791517993271,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/other",
+      "component_id": "tab-two",
+      "action_id": "click",
+      "served_version": null
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "35d807d6-a4fd-4b88-b977-93b011cc4e76",
+    "event_type": "interaction_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.312Z",
+    "captured_at": "2026-10-09T03:53:13.312Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 4,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.173Z",
+      "policy_version": "1",
+      "epoch": 1791517993173,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/second/",
+      "component_id": "tab-one",
+      "action_id": "click",
+      "served_version": null
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "ff3cfc12-a295-4b20-a010-523ac96ddaba",
+    "event_type": "interaction_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.312Z",
+    "captured_at": "2026-10-09T03:53:13.312Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 4,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.271Z",
+      "policy_version": "1",
+      "epoch": 1791517993271,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/other",
+      "component_id": "tab-two",
+      "action_id": "click",
+      "served_version": null
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "35d807d6-a4fd-4b88-b977-93b011cc4e76",
+    "event_type": "interaction_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.312Z",
+    "captured_at": "2026-10-09T03:53:13.312Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 4,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.173Z",
+      "policy_version": "1",
+      "epoch": 1791517993173,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/second/",
+      "component_id": "tab-one",
+      "action_id": "click",
+      "served_version": null
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "ff3cfc12-a295-4b20-a010-523ac96ddaba",
+    "event_type": "interaction_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.312Z",
+    "captured_at": "2026-10-09T03:53:13.312Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 4,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.271Z",
+      "policy_version": "1",
+      "epoch": 1791517993271,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/other",
+      "component_id": "tab-two",
+      "action_id": "click",
+      "served_version": null
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "35d807d6-a4fd-4b88-b977-93b011cc4e76",
+    "event_type": "interaction_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.312Z",
+    "captured_at": "2026-10-09T03:53:13.312Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 4,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.173Z",
+      "policy_version": "1",
+      "epoch": 1791517993173,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/second/",
+      "component_id": "tab-one",
+      "action_id": "click",
+      "served_version": null
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "ff3cfc12-a295-4b20-a010-523ac96ddaba",
+    "event_type": "interaction_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.312Z",
+    "captured_at": "2026-10-09T03:53:13.312Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 4,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.271Z",
+      "policy_version": "1",
+      "epoch": 1791517993271,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/other",
+      "component_id": "tab-two",
+      "action_id": "click",
+      "served_version": null
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "b314c6ef-364e-47a7-a058-67780878e98b",
+    "event_type": "interaction_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.361Z",
+    "captured_at": "2026-10-09T03:53:13.361Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 5,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.173Z",
+      "policy_version": "1",
+      "epoch": 1791517993173,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/second/",
+      "component_id": "hero",
+      "action_id": "shop",
+      "served_version": null
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "ff53fcbc-2451-4cee-afc7-574d84bbc78c",
+    "event_type": "interaction_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.388Z",
+    "captured_at": "2026-10-09T03:53:13.388Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 6,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.173Z",
+      "policy_version": "1",
+      "epoch": 1791517993173,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/second/",
+      "component_id": "hero",
+      "action_id": "shop",
+      "served_version": null
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "bfcc9037-453f-40a6-9330-20768e411a8e",
+    "event_type": "consent_changed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.396Z",
+    "captured_at": "2026-10-09T03:53:13.396Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 7,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.395Z",
+      "policy_version": "1",
+      "epoch": 1791517993395,
+      "gpc": false,
+      "analytics": "denied",
+      "advertising": "unknown",
+      "email_marketing": "unknown",
+      "sms_marketing": "unknown"
+    },
+    "payload": {
+      "previous_epoch": 1791517993173
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "c82544e8-8dae-46bf-ab7e-a2d7cecae455",
+    "event_type": "consent_changed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.396Z",
+    "captured_at": "2026-10-09T03:53:13.396Z",
+    "visitor_id": "5fe66e11-2fc4-46b4-893c-ee5a03562fa6",
+    "session_id": "c1be9969-8213-4e6c-8a03-fbaa1b924592",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 5,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.396Z",
+      "policy_version": "1",
+      "epoch": 1791517993395,
+      "gpc": false,
+      "analytics": "denied",
+      "advertising": "unknown",
+      "email_marketing": "unknown",
+      "sms_marketing": "unknown"
+    },
+    "payload": {
+      "previous_epoch": 1791517993271
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "7dc220c1-8c7b-4876-8c88-3384bdfeb744",
+    "event_type": "page_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.437Z",
+    "captured_at": "2026-10-09T03:53:13.437Z",
+    "visitor_id": "6c77353a-857b-4534-ac21-7dfa83b489e3",
+    "session_id": "13629334-afbd-4ccf-94ae-eb5680794bd9",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 8,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.434Z",
+      "policy_version": "1",
+      "epoch": 1791517993434,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "ac193747-aa5c-40f6-8363-102a443e5aa6",
+      "path": "/second/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {
+          "source": "facebook",
+          "medium": "cpc"
+        },
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/second/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {
+            "source": "facebook",
+            "medium": "cpc"
+          },
+          "click_ids": {},
+          "click_id_types": [],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:13.436Z",
+      "session_aliases": [],
+      "stream_id": "d5753da3-a223-411d-9418-131325579d6e"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "64aa2dc1-b94a-488e-ab74-80efe446c651",
+    "event_type": "product_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.437Z",
+    "captured_at": "2026-10-09T03:53:13.437Z",
+    "visitor_id": "6c77353a-857b-4534-ac21-7dfa83b489e3",
+    "session_id": "13629334-afbd-4ccf-94ae-eb5680794bd9",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 9,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.434Z",
+      "policy_version": "1",
+      "epoch": 1791517993434,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "ac193747-aa5c-40f6-8363-102a443e5aa6",
+      "path": "/second/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {
+          "source": "facebook",
+          "medium": "cpc"
+        },
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/second/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {
+            "source": "facebook",
+            "medium": "cpc"
+          },
+          "click_ids": {},
+          "click_id_types": [],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:13.436Z",
+      "session_aliases": [],
+      "stream_id": "d5753da3-a223-411d-9418-131325579d6e"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "337ad756-a38f-407e-9728-862f688b4550",
+    "event_type": "consent_changed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.456Z",
+    "captured_at": "2026-10-09T03:53:13.456Z",
+    "visitor_id": "6c77353a-857b-4534-ac21-7dfa83b489e3",
+    "session_id": "13629334-afbd-4ccf-94ae-eb5680794bd9",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 10,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.456Z",
+      "policy_version": "1",
+      "epoch": 1791517993456,
+      "gpc": true,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "previous_epoch": 1791517993434
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "c7e52c1a-0637-439b-a96c-a008fa6c7f36",
+    "event_type": "interaction_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.459Z",
+    "captured_at": "2026-10-09T03:53:13.459Z",
+    "visitor_id": "6c77353a-857b-4534-ac21-7dfa83b489e3",
+    "session_id": "13629334-afbd-4ccf-94ae-eb5680794bd9",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 11,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.456Z",
+      "policy_version": "1",
+      "epoch": 1791517993456,
+      "gpc": true,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/second/",
+      "component_id": "hero",
+      "action_id": "shop",
+      "served_version": null
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "f02d884c-fecc-4163-8387-7e8571289d3c",
+    "event_type": "page_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.467Z",
+    "captured_at": "2026-10-09T03:53:13.467Z",
+    "visitor_id": "d422d988-4c27-4f05-83e4-6550c87140cf",
+    "session_id": "af8ed97a-2547-41e2-97fe-94afae4c328f",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 12,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.456Z",
+      "policy_version": "1",
+      "epoch": 1791517993456,
+      "gpc": true,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "ac193747-aa5c-40f6-8363-102a443e5aa6",
+      "path": "/second/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {
+          "source": "facebook",
+          "medium": "cpc"
+        },
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/second/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {
+            "source": "facebook",
+            "medium": "cpc"
+          },
+          "click_ids": {},
+          "click_id_types": [],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:13.467Z",
+      "session_aliases": [],
+      "stream_id": "d5753da3-a223-411d-9418-131325579d6e"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "3b88a036-95a0-4469-a5db-08218e7db726",
+    "event_type": "product_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.467Z",
+    "captured_at": "2026-10-09T03:53:13.467Z",
+    "visitor_id": "d422d988-4c27-4f05-83e4-6550c87140cf",
+    "session_id": "af8ed97a-2547-41e2-97fe-94afae4c328f",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 13,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.456Z",
+      "policy_version": "1",
+      "epoch": 1791517993456,
+      "gpc": true,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "ac193747-aa5c-40f6-8363-102a443e5aa6",
+      "path": "/second/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {
+          "source": "facebook",
+          "medium": "cpc"
+        },
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/second/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {
+            "source": "facebook",
+            "medium": "cpc"
+          },
+          "click_ids": {},
+          "click_id_types": [],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:13.467Z",
+      "session_aliases": [],
+      "stream_id": "d5753da3-a223-411d-9418-131325579d6e"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "14efc238-8947-4373-9aa7-14241b3bb404",
+    "event_type": "interaction_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:13.467Z",
+    "captured_at": "2026-10-09T03:53:13.467Z",
+    "visitor_id": "d422d988-4c27-4f05-83e4-6550c87140cf",
+    "session_id": "af8ed97a-2547-41e2-97fe-94afae4c328f",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 14,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:13.456Z",
+      "policy_version": "1",
+      "epoch": 1791517993456,
+      "gpc": true,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/second/",
+      "component_id": "hero",
+      "action_id": "shop",
+      "served_version": null
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "23d0913f-8454-4bc4-9434-25fcc0bcbc71",
+    "event_type": "page_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.222Z",
+    "captured_at": "2026-10-09T03:53:18.222Z",
+    "visitor_id": "d422d988-4c27-4f05-83e4-6550c87140cf",
+    "session_id": "6b08a2bf-9684-44fc-90fb-c7d7c8b48701",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 1,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.219Z",
+      "policy_version": "1",
+      "epoch": 1791517998219,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "126d437b-93a5-4504-9edf-c8e9ae0aaaf0",
+      "path": "/blocked",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/blocked",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {},
+          "click_id_types": [],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "page_local",
+      "session_started_at": "2026-10-09T03:53:18.221Z",
+      "session_aliases": [],
+      "stream_id": "f9ac3e76-bfd4-4222-8695-5bea0f809d34"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "9c792e28-eebb-4653-af92-99c6d754490c",
+    "event_type": "product_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.222Z",
+    "captured_at": "2026-10-09T03:53:18.222Z",
+    "visitor_id": "d422d988-4c27-4f05-83e4-6550c87140cf",
+    "session_id": "6b08a2bf-9684-44fc-90fb-c7d7c8b48701",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 2,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.219Z",
+      "policy_version": "1",
+      "epoch": 1791517998219,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "126d437b-93a5-4504-9edf-c8e9ae0aaaf0",
+      "path": "/blocked",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/blocked",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {},
+          "click_id_types": [],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "page_local",
+      "session_started_at": "2026-10-09T03:53:18.221Z",
+      "session_aliases": [],
+      "stream_id": "f9ac3e76-bfd4-4222-8695-5bea0f809d34"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "1e339474-c7a3-4845-9a61-c5f2e9001c96",
+    "event_type": "checkout_started",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.223Z",
+    "captured_at": "2026-10-09T03:53:18.223Z",
+    "visitor_id": "d422d988-4c27-4f05-83e4-6550c87140cf",
+    "session_id": "6b08a2bf-9684-44fc-90fb-c7d7c8b48701",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 3,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.219Z",
+      "policy_version": "1",
+      "epoch": 1791517998219,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/blocked",
+      "checkout_attempt_id": "d1d6d2c0-2c5e-4fa4-849f-98abc08a5e4c",
+      "adapter": "woocommerce-checkout-1",
+      "stage": "started"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "85278783-7374-4db5-87cd-e97fad090264",
+    "event_type": "page_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.267Z",
+    "captured_at": "2026-10-09T03:53:18.267Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 1,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.265Z",
+      "policy_version": "1",
+      "epoch": 1791517998265,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "83480cb6-f13a-4a9e-bd11-be3589fe3f9f",
+      "path": "/retry/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {
+          "gclid": "queued_click"
+        },
+        "click_id_types": [
+          "gclid"
+        ],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/retry/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {
+            "gclid": "queued_click"
+          },
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:18.266Z",
+      "session_aliases": [],
+      "stream_id": "ade5ae29-90fa-48e0-ba2b-eb9d67701313"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "70ef9338-f97a-4203-8ca7-e4b88994514b",
+    "event_type": "product_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.267Z",
+    "captured_at": "2026-10-09T03:53:18.267Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 2,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.265Z",
+      "policy_version": "1",
+      "epoch": 1791517998265,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "83480cb6-f13a-4a9e-bd11-be3589fe3f9f",
+      "path": "/retry/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {
+          "gclid": "queued_click"
+        },
+        "click_id_types": [
+          "gclid"
+        ],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/retry/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {
+            "gclid": "queued_click"
+          },
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:18.266Z",
+      "session_aliases": [],
+      "stream_id": "ade5ae29-90fa-48e0-ba2b-eb9d67701313"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "6bc2d966-218f-40cc-93b4-f7545af48a72",
+    "event_type": "checkout_started",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.267Z",
+    "captured_at": "2026-10-09T03:53:18.267Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 3,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.265Z",
+      "policy_version": "1",
+      "epoch": 1791517998265,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "granted",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/retry/",
+      "checkout_attempt_id": "273fa04a-a9a9-4b35-80e3-3a8420dad790",
+      "adapter": "woocommerce-checkout-1",
+      "stage": "started"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "f555af33-d659-4b69-9be4-758c44e3a023",
+    "event_type": "page_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.303Z",
+    "captured_at": "2026-10-09T03:53:18.303Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 1,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.299Z",
+      "policy_version": "1",
+      "epoch": 1791517998299,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "488d1695-12b9-4ab9-a42d-b8f60e726fb7",
+      "path": "/next-consent/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/retry/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {},
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:18.266Z",
+      "session_aliases": [],
+      "stream_id": "967f9a1d-3a01-46e6-89f7-a3772789e07c"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "50ca97bb-852f-44a9-9b68-cc3f5c2ca503",
+    "event_type": "product_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.304Z",
+    "captured_at": "2026-10-09T03:53:18.304Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 2,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.299Z",
+      "policy_version": "1",
+      "epoch": 1791517998299,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "488d1695-12b9-4ab9-a42d-b8f60e726fb7",
+      "path": "/next-consent/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/retry/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {},
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:18.266Z",
+      "session_aliases": [],
+      "stream_id": "967f9a1d-3a01-46e6-89f7-a3772789e07c"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "e44b2e46-2d02-47fe-b426-28c43b8a7be6",
+    "event_type": "checkout_started",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.304Z",
+    "captured_at": "2026-10-09T03:53:18.304Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 3,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.299Z",
+      "policy_version": "1",
+      "epoch": 1791517998299,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/next-consent/",
+      "checkout_attempt_id": "150acc30-8577-47ec-a841-318c7110946b",
+      "adapter": "woocommerce-checkout-1",
+      "stage": "started"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "900dad8d-40ab-4033-8f5a-c85ddc8478ee",
+    "event_type": "checkout_stage_observed",
+    "site_id": "site_fixture",
+    "installation_id": "install_fixture",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.312Z",
+    "captured_at": "2026-10-09T03:53:18.312Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 4,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.299Z",
+      "policy_version": "1",
+      "epoch": 1791517998299,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/next-consent/",
+      "checkout_attempt_id": "150acc30-8577-47ec-a841-318c7110946b",
+      "adapter": "registered",
+      "stage": "submitted"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "eb19e395-309e-4dfa-8289-a5c8d19a6daf",
+    "event_type": "page_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "replacement_install",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.340Z",
+    "captured_at": "2026-10-09T03:53:18.340Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 1,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.336Z",
+      "policy_version": "1",
+      "epoch": 1791517998336,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "ac61f6d6-5dd4-4d6c-8dcd-5c13c7d14ef0",
+      "path": "/replacement/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/retry/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {},
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:18.266Z",
+      "session_aliases": [],
+      "stream_id": "7f4dc59b-6e2e-4368-8a36-c6248f57519e"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "11b1d0aa-585a-4dc9-87f6-646ab5277723",
+    "event_type": "product_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "replacement_install",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.340Z",
+    "captured_at": "2026-10-09T03:53:18.340Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 2,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.336Z",
+      "policy_version": "1",
+      "epoch": 1791517998336,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "ac61f6d6-5dd4-4d6c-8dcd-5c13c7d14ef0",
+      "path": "/replacement/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/retry/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {},
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:18.266Z",
+      "session_aliases": [],
+      "stream_id": "7f4dc59b-6e2e-4368-8a36-c6248f57519e"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "0ca820bc-1755-47df-a0c6-4806555ddbb0",
+    "event_type": "checkout_started",
+    "site_id": "site_fixture",
+    "installation_id": "replacement_install",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.341Z",
+    "captured_at": "2026-10-09T03:53:18.341Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 3,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.336Z",
+      "policy_version": "1",
+      "epoch": 1791517998336,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/replacement/",
+      "checkout_attempt_id": "4ed4d79b-0bf6-4c91-873f-76e6170e24f2",
+      "adapter": "woocommerce-checkout-1",
+      "stage": "started"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "8c340105-e6dc-4719-b43e-571b1ca83ea6",
+    "event_type": "page_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "replacement_install",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.373Z",
+    "captured_at": "2026-10-09T03:53:18.373Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 1,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.370Z",
+      "policy_version": "1",
+      "epoch": 1791517998370,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "04e4fc4d-aaaa-4ede-8b9b-1a75cc467c6a",
+      "path": "/replacement/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/retry/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {},
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:18.266Z",
+      "session_aliases": [],
+      "stream_id": "932d48ce-9671-428c-ab5c-36d3ae3433b3"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "2e61692e-7187-46ae-9943-c3fb31944332",
+    "event_type": "product_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "replacement_install",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.373Z",
+    "captured_at": "2026-10-09T03:53:18.373Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 2,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.370Z",
+      "policy_version": "1",
+      "epoch": 1791517998370,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "04e4fc4d-aaaa-4ede-8b9b-1a75cc467c6a",
+      "path": "/replacement/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/retry/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {},
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:18.266Z",
+      "session_aliases": [],
+      "stream_id": "932d48ce-9671-428c-ab5c-36d3ae3433b3"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "2010bae9-4d77-4e88-8ec0-8b3d33735f59",
+    "event_type": "checkout_started",
+    "site_id": "site_fixture",
+    "installation_id": "replacement_install",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.374Z",
+    "captured_at": "2026-10-09T03:53:18.374Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 3,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.370Z",
+      "policy_version": "1",
+      "epoch": 1791517998370,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/replacement/",
+      "checkout_attempt_id": "a5ac85d7-1967-4cac-bc2f-0008d0fc9b32",
+      "adapter": "woocommerce-checkout-1",
+      "stage": "started"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "3acd8163-8532-4e4c-87e5-e854cd1552c5",
+    "event_type": "page_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "replacement_install",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.400Z",
+    "captured_at": "2026-10-09T03:53:18.400Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 1,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.398Z",
+      "policy_version": "1",
+      "epoch": 1791517998398,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "79099366-8712-4bdf-98d1-39c834b6637a",
+      "path": "/replacement/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/retry/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {},
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:18.266Z",
+      "session_aliases": [],
+      "stream_id": "370d5273-51c5-4050-8198-24a9b48ee66f"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "a0b49923-6329-4da9-93f8-83cf58bd615c",
+    "event_type": "product_viewed",
+    "site_id": "site_fixture",
+    "installation_id": "replacement_install",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.400Z",
+    "captured_at": "2026-10-09T03:53:18.400Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 2,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.398Z",
+      "policy_version": "1",
+      "epoch": 1791517998398,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "navigation_id": "79099366-8712-4bdf-98d1-39c834b6637a",
+      "path": "/replacement/",
+      "page_id": "42",
+      "entry_type": "product",
+      "classification_version": "1",
+      "storefront": "th-TH",
+      "served_version": null,
+      "product_id": "42",
+      "variation_id": null,
+      "source_evidence": {
+        "utm": {},
+        "click_ids": {},
+        "click_id_types": [],
+        "referrer_domain": null
+      },
+      "entry": {
+        "path": "/retry/",
+        "entry_type": "product",
+        "source_evidence": {
+          "utm": {},
+          "click_ids": {},
+          "click_id_types": [
+            "gclid"
+          ],
+          "referrer_domain": null
+        }
+      },
+      "continuity": "shared",
+      "session_started_at": "2026-10-09T03:53:18.266Z",
+      "session_aliases": [],
+      "stream_id": "370d5273-51c5-4050-8198-24a9b48ee66f"
+    }
+  },
+  {
+    "schema_version": "3.0.0",
+    "plugin_version": "3.0.0-alpha.4",
+    "event_id": "89647c2c-d3ea-4672-810e-29e5cbff2ca3",
+    "event_type": "checkout_started",
+    "site_id": "site_fixture",
+    "installation_id": "replacement_install",
+    "environment": "test",
+    "producer": "browser",
+    "evidence_class": "observation",
+    "occurred_at": "2026-10-09T03:53:18.400Z",
+    "captured_at": "2026-10-09T03:53:18.400Z",
+    "visitor_id": "49d66b42-30ce-4826-a9d6-e0294241928d",
+    "session_id": "cd382790-b521-4812-9b4f-e8f753c61a07",
+    "cart_id": null,
+    "entity": null,
+    "origin_system": "browser",
+    "operation_id": null,
+    "causation_id": null,
+    "sequence": 3,
+    "consent": {
+      "source": "test_cmp",
+      "effective_at": "2026-10-09T03:53:18.398Z",
+      "policy_version": "1",
+      "epoch": 1791517998398,
+      "gpc": false,
+      "analytics": "granted",
+      "advertising": "denied",
+      "email_marketing": "unknown",
+      "sms_marketing": "denied"
+    },
+    "payload": {
+      "page": "/replacement/",
+      "checkout_attempt_id": "5dbb1276-22df-479b-9e92-ee2638bdf289",
+      "adapter": "woocommerce-checkout-1",
+      "stage": "started"
+    }
+  }
+]

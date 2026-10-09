@@ -1,0 +1,33 @@
+{
+  "scope": "Fresh WP-CLI process after measurement-pilot.php; configured synthetic legacy feed plus v3 capture",
+  "results": [
+    {
+      "wordpress": "6.9.4",
+      "woocommerce": "9.9.5",
+      "hpos": false,
+      "both_producers_booted": true,
+      "legacy_configured": true
+    },
+    {
+      "wordpress": "6.9.4",
+      "woocommerce": "9.9.5",
+      "hpos": true,
+      "both_producers_booted": true,
+      "legacy_configured": true
+    },
+    {
+      "wordpress": "7.1.3",
+      "woocommerce": "11.2.0",
+      "hpos": false,
+      "both_producers_booted": true,
+      "legacy_configured": true
+    },
+    {
+      "wordpress": "7.1.3",
+      "woocommerce": "11.2.0",
+      "hpos": true,
+      "both_producers_booted": true,
+      "legacy_configured": true
+    }
+  ]
+}

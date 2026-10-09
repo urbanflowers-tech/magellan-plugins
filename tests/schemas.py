@@ -8,6 +8,8 @@ validator=Draft202012Validator(schema,format_checker=FormatChecker())
 events=json.loads((r/'tests/captured-events.json').read_text())+json.loads((r/'tests/browser-events.json').read_text())
 if (r/'tests/custom-checkout-events.json').exists():
     events+=json.loads((r/'tests/custom-checkout-events.json').read_text())
+if (r/'tests/pilot-browser-events.json').exists():
+    events+=json.loads((r/'tests/pilot-browser-events.json').read_text())
 by_type={}
 for event in events:
     validator.validate(event);by_type.setdefault(event['event_type'],event)

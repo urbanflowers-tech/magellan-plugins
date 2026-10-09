@@ -1,9 +1,9 @@
 {
     "runtime": {
-        "wordpress": "7.1.3",
-        "woocommerce": "11.2.0",
+        "wordpress": "6.9.4",
+        "woocommerce": "9.9.5",
         "php": "8.2.29",
-        "hpos": true
+        "hpos": false
     },
     "merchant_source_sha256": "4acd0503503c2bf58d6b4b4bd1049d343ddf98cd97c71d27ac964bb839442af2",
     "scope": "Actual merchant order handler in isolated WordPress; simulated provider object; HTTP and mail disabled; no gateway transaction",

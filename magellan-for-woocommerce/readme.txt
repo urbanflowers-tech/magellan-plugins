@@ -3,7 +3,7 @@ Contributors: magellan
 Tags: analytics, woocommerce, attribution
 Requires at least: 6.0
 Requires PHP: 8.0
-Stable tag: 3.0.0-alpha.3
+Stable tag: 3.0.0-alpha.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,10 @@ wp magellan maintenance
 See BUILD-HANDOFF.md in the source bundle for schemas, endpoint contracts, migration, validation results and release gates.
 
 == Changelog ==
+
+= 3.0.0-alpha.4 =
+* Add an explicit receiver-confirmed measurement-only mode that keeps the existing sender and scheduled work running.
+* Require matching collection mode during the signed connection challenge; report coexistence in diagnostics.
 
 = 3.0.0-alpha.3 =
 * Filter persisted browser evidence by current consent and installation before every send.
