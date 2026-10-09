@@ -3,7 +3,7 @@ Contributors: magellan
 Tags: analytics, woocommerce, attribution
 Requires at least: 6.0
 Requires PHP: 8.0
-Stable tag: 3.0.0-alpha.2
+Stable tag: 3.0.0-alpha.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,10 @@ wp magellan maintenance
 See BUILD-HANDOFF.md in the source bundle for schemas, endpoint contracts, migration, validation results and release gates.
 
 == Changelog ==
+
+= 3.0.0-alpha.3 =
+* Filter persisted browser evidence by current consent and installation before every send.
+* Recover from malformed queue storage, validate receipt timestamps and serialize concurrent flush triggers.
 
 = 3.0.0-alpha.2 =
 * Preserve consented source/session and server-cart links for express checkout handlers that emit only the processed-order hook.

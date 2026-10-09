@@ -1,10 +1,12 @@
 # Magellan WordPress plugin v3 — build and backend handoff
 
-**Build:** 3.0.0-alpha.2 · **Protocol/schema:** 3 / 3.0.0 · **Date:** 9 October 2026
+**Build:** 3.0.0-alpha.3 · **Protocol/schema:** 3 / 3.0.0 · **Date:** 9 October 2026
 
-This is an installable development candidate built from the existing `magellan-for-woocommerce` 2.5.0 repository. Alpha.1 was installed on the verified Urbanflowers staging site and passed initial installation checks and a sampled cart/checkout-entry journey. V3 remains disconnected pending the Magellan receiver; those hosted checks exercised legacy compatibility mode. Alpha.2 fixes a reproduced express-checkout attribution gap. No production deployment, Magellan backend deployment, GitHub push or automatic-update release has been performed.
+This is an installable development candidate built from the existing `magellan-for-woocommerce` 2.5.0 repository. Alpha.1 was installed on the verified Urbanflowers staging site and passed initial installation checks and a sampled cart/checkout-entry journey. V3 remains disconnected pending the Magellan receiver; those hosted checks exercised legacy compatibility mode. Alpha.2 fixes a reproduced express-checkout attribution gap. Alpha.3 fixes six reproduced browser resilience defects: retained advertising evidence after consent denial, old-installation queue reimport, object-format queue storage, null queue entries, invalid receipt timestamps and overlapping sends. No production deployment, Magellan backend deployment, GitHub push or automatic-update release has been performed.
 
 Urbanflowers' express-order handler creates a WooCommerce order directly and emits `woocommerce_checkout_order_processed`, bypassing the usual create/created checkout hooks. Alpha.2 observes that processed hook, freezes consented context once and deduplicates the normal path where both hooks fire. The actual merchant PHP handler was exercised with a synthetic provider object in a disposable installation, with HTTP and mail disabled. This does not certify a real Apple Pay, Google Pay or Stripe transaction.
+
+Alpha.3 is now active on Urbanflowers staging in legacy compatibility mode. All 24 installed files match its ZIP, 11 installation/access checks passed, both homepages respond successfully, and both hosted v3 scripts match the build. An alpha.2 backup was made before replacement. This verifies installation, not an active v3 measurement connection.
 
 Magellan remains the autonomous operator and owner of inventory, canonical orders, payments and finance. The plugin collects channel evidence. It neither reserves stock nor books revenue, settles payments, computes attribution, sends advertisements, or edits storefront pages autonomously.
 
@@ -132,7 +134,7 @@ window.MagellanV3.setConsent({
 });
 ```
 
-It can also dispatch `magellan:consent` with that object. A known initial state can be placed in `window.MagellanConsent` by the site's consent adapter in the browser, not in shared personalized cached HTML. The included Cookiebot adapter waits for an actual response. It does not equate cookie marketing consent with email/SMS marketing permission. Unknown/denied analytics creates no new persistent analytics identity. Withdrawal purges queued browser events and identifiers and broadcasts the change to other tabs. A minimal consent-control notice is sent best effort; central privacy controls must not depend solely on successful browser delivery.
+It can also dispatch `magellan:consent` with that object. A known initial state can be placed in `window.MagellanConsent` by the site's consent adapter in the browser, not in shared personalized cached HTML. The included Cookiebot adapter waits for an actual response. It does not equate cookie marketing consent with email/SMS marketing permission. Unknown/denied analytics creates no new persistent analytics identity. Withdrawal purges queued browser events and identifiers and broadcasts the change to other tabs. On later navigation, persisted events whose captured permissions exceed current consent are dropped whole; immutable event bodies are never rewritten to strip fields. Queue merges also enforce the current installation/site/environment/visitor binding and 24-hour horizon. Invalid storage is discarded without preventing startup. A minimal consent-control notice is sent best effort; central privacy controls must not depend solely on successful browser delivery.
 
 Register selected interactions with `MagellanV3.registerInteraction('hero-shop')`, then use `data-magellan-component="hero-shop"` and `data-magellan-action="shop"` or call `interaction`. Unregistered clicks and form values are not sent. Checkout error messages and payment details are never scraped. The current checkout adapter honestly reports unknown error categories; richer gateway-specific stages are not certified.
 
@@ -152,18 +154,19 @@ The WordPress eraser removes local order analytics links and queues a privacy re
 
 ## Local verification and remaining release gates
 
-All checks below passed for this build:
+Current verification is listed below. The server implementation is unchanged from alpha.2, so the four WordPress/WooCommerce integration runs are retained evidence rather than newly repeated runs. The changed browser code was rerun in Chrome and in deterministic browser-API fixtures.
 
 | Check | Result |
 |---|---|
-| WordPress 7.1.3 / WooCommerce 11.2.0 | 51 integration plus 10 merchant express-checkout checks in each of legacy and HPOS storage |
-| WordPress 6.9.4 / WooCommerce 9.9.5 (staging software versions) | The same 51 integration plus 10 express-checkout checks in each storage mode |
-| Isolated Chrome browser | 20 checks passed for the unchanged browser assets in alpha.1; not rerun for this PHP-only fix |
+| WordPress 7.1.3 / WooCommerce 11.2.0 | 51 integration plus 10 merchant express-checkout checks in each of legacy and HPOS storage (alpha.2 server implementation) |
+| WordPress 6.9.4 / WooCommerce 9.9.5 (staging software versions) | The same 51 integration plus 10 express-checkout checks in each storage mode (alpha.2 server implementation) |
+| Isolated Chrome browser | 26 checks passed on alpha.3, including real-browser consent/storage regressions |
+| Browser resilience fixtures | 21 checks passed on alpha.3; queue/batch bounds, partial receipts, retry ceiling, beacon retention and concurrent sends |
 | Cross-language contracts | 155 checks |
-| JSON Schemas | 172 valid event fixtures accepted; 3 invalid fixtures rejected |
+| JSON Schemas | 188 valid event fixtures accepted; 3 invalid fixtures rejected |
 | PHP syntax | 18 files clean |
 
-Both isolated WordPress/WooCommerce pairs used PHP 8.2.29 and MySQL 8.4.0. Hosted staging uses PHP 8.2.34 and MariaDB 10.11.18; matching the WordPress/WooCommerce versions does not reproduce the entire host. Browser checks ran on Chrome 155.0.8059.40. The unchanged core browser script is 5,335 bytes gzipped; its checkout adapter is 645 bytes gzipped. The latest local fixture of 100 small event captures measured 11.04 ms at p95; this is a local capture measurement, not a checkout or Core Web Vitals benchmark or a production performance gate.
+Both isolated WordPress/WooCommerce pairs used PHP 8.2.29 and MySQL 8.4.0. Hosted staging uses PHP 8.2.34 and MariaDB 10.11.18; matching the WordPress/WooCommerce versions does not reproduce the entire host. Browser checks ran on Chrome 155.0.8059.40. The core browser script is 5,592 bytes gzipped; its checkout adapter is 645 bytes gzipped. The retained alpha.2 local fixture of 100 small event captures measured 11.04 ms at p95; this is a local capture measurement, not a checkout or Core Web Vitals benchmark or a production performance gate.
 
 The source bundle contains the executable tests and their saved results. PHP integration tests use real WordPress, WooCommerce, MySQL and Action Scheduler, with simulated Magellan HTTP outcomes. Browser tests use a real isolated Chrome context with an intercepted collector. Signature/schema tests join these fixtures across languages.
 

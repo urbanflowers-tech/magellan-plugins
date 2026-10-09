@@ -81,6 +81,30 @@
     {
       "test": "blocked storage reports page-local continuity",
       "pass": true
+    },
+    {
+      "test": "failed browser receipt keeps raw click evidence while consent is granted",
+      "pass": true
+    },
+    {
+      "test": "new page cannot resend old queued click IDs after advertising denial",
+      "pass": true
+    },
+    {
+      "test": "replacement installation discards the old pending queue",
+      "pass": true
+    },
+    {
+      "test": "object queue recover in a real browser",
+      "pass": true
+    },
+    {
+      "test": "null entries recover in a real browser",
+      "pass": true
+    },
+    {
+      "test": "browser resilience scenarios produce no exceptions",
+      "pass": true
     }
   ]
 }

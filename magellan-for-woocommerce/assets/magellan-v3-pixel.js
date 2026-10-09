@@ -70,8 +70,15 @@
     context();
     return prior !== session.id;
   }
+  function pendingAllowed(e) {
+    if (!e || typeof e !== 'object' || e.site_id!==c.site_id || e.installation_id!==c.installation_id || e.environment!==c.environment || e.producer!=='browser' || e.visitor_id!==visitor || !e.consent || e.consent.analytics!=='granted') return false;
+    // Keep immutable event bodies: discard evidence whose captured permissions exceed current consent.
+    if (['advertising','email_marketing','sms_marketing'].some(function (purpose) { return e.consent[purpose]==='granted' && consent[purpose]!=='granted'; })) return false;
+    var age=Date.now()-Date.parse(e.captured_at);
+    return typeof e.event_id==='string' && /^[a-f0-9-]{36}$/.test(e.event_id) && Number.isFinite(age) && age>=-300000 && age<=86400000;
+  }
   function bounded(items) {
-    items=items.filter(function (e) { return e.visitor_id===visitor && Date.now()-Date.parse(e.captured_at)<=86400000; }).slice(-100);
+    items=(Array.isArray(items)?items:[]).filter(pendingAllowed).slice(-100);
     while (bytes(JSON.stringify(items))>65536) items.shift();
     return items;
   }
@@ -82,7 +89,7 @@
       if (!allowed() || consent.epoch!==epoch || visitor!==owner) return;
       if (!persistent) { queue=bounded(queue.filter(function (e) { return !ack.has(e.event_id); })); return; }
       var stored=read('queue'), byId=new Map();
-      (Array.isArray(stored)?stored:[]).concat(additions).forEach(function (e) { if (!ack.has(e.event_id)) byId.set(e.event_id,e); });
+      (Array.isArray(stored)?stored:[]).concat(additions).forEach(function (e) { if (pendingAllowed(e) && !ack.has(e.event_id)) byId.set(e.event_id,e); });
       queue=bounded(Array.from(byId.values())); write('queue',queue);
     }
     queueWrites=queueWrites.then(function () { return persistent && navigator.locks ? navigator.locks.request(prefix+'queue',merge) : merge(); }).catch(function () {});
@@ -112,7 +119,7 @@
   }
   async function flush(closing) {
     if (sending || !allowed() || !queue.length || attempts >= 5) return;
-    await persistQueue(); if (!allowed()) return; var batch = [], size = 13;
+    await persistQueue(); if (sending || !allowed() || attempts >= 5) return; var batch = [], size = 13;
     queue.some(function (e) { var n = bytes(JSON.stringify(e))+1; if (batch.length === 10 || size+n > 16384) return true; batch.push(e); size+=n; return false; });
     if (!batch.length) return;
     var body = JSON.stringify({events:batch});
@@ -127,7 +134,7 @@
       var result = await response.json(), accepted = new Set();
       for (var e of batch) {
         var r = (Array.isArray(result.results) ? result.results : []).find(function (x) { return x.event_id === e.event_id; });
-        if (r && ['accepted','duplicate'].includes(r.status) && r.receipt_id && r.received_at && r.body_hash === await hash(e)) accepted.add(e.event_id);
+        if (r && ['accepted','duplicate'].includes(r.status) && typeof r.receipt_id==='string' && r.receipt_id && typeof r.received_at==='string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(r.received_at) && Number.isFinite(Date.parse(r.received_at)) && r.body_hash === await hash(e)) accepted.add(e.event_id);
       }
       if (allowed() && consent.epoch === epoch) { queue = queue.filter(function (e) { return !accepted.has(e.event_id); }); accepted.forEach(function (id) { owned.delete(id); }); await persistQueue(accepted); if (accepted.size) attempts=0; }
     } catch (_) { /* A missing acknowledgement remains pending, including a failed response read. */ }
@@ -161,7 +168,7 @@
       visitor=existing; cookie('_mgln_v3_visitor',visitor,15552000);
       persistent=getCookie('_mgln_v3_visitor') === visitor && write('probe',true); remove('probe');
       if (!persistent) { cookie('_mgln_v3_visitor','',0); cookie('_mgln_v3_context','',0); }
-      queue=persistent ? (read('queue') || []).filter(function (e) { return e.visitor_id===visitor && e.installation_id===c.installation_id && e.consent && e.consent.analytics==='granted'; }) : [];
+      queue=persistent ? bounded(read('queue')) : [];
       ensureSession(); persistQueue();
       if (!started) { started=true; page(); w.dispatchEvent(new CustomEvent('magellan:ready')); }
     }

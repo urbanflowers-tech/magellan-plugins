@@ -8,11 +8,11 @@ const root = path.resolve(__dirname, '..');
 const results = [], captured = [];
 const check = (name, value) => { assert.ok(value, name); results.push({test:name,pass:true}); };
 const grant = {analytics:'granted',advertising:'granted',email_marketing:'unknown',sms_marketing:'denied',source:'test_cmp'};
-const config = {site_id:'site_fixture',installation_id:'install_fixture',environment:'test',endpoint:'https://collector.example/events',origin:'https://shop.example.co.th',plugin_version:'3.0.0-alpha.1',policy_version:'1',page_id:'42',product_id:'42',entry_type:'product',classification_version:'1',storefront:'th-TH',served_version:null};
+const config = {site_id:'site_fixture',installation_id:'install_fixture',environment:'test',endpoint:'https://collector.example/events',origin:'https://shop.example.co.th',plugin_version:'3.0.0-alpha.3',policy_version:'1',page_id:'42',product_id:'42',entry_type:'product',classification_version:'1',storefront:'th-TH',served_version:null};
 (async () => {
   const browser = await chromium.launch({headless:true,...(process.env.CHROME_EXECUTABLE ? {executablePath:process.env.CHROME_EXECUTABLE} : {})});
   try {
-    const context = await browser.newContext(); let mode = 'accepted';
+    const context = await browser.newContext(); let mode = 'accepted', initialConsent = null;
     await context.route('**/*',async route => {
       const request=route.request(); const url=request.url();
       if (url.startsWith('https://collector.example/')) {
@@ -22,7 +22,7 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
       }
       if (url.endsWith('/pixel.js')) return route.fulfill({contentType:'application/javascript',body:fs.readFileSync(root+'/magellan-for-woocommerce/assets/magellan-v3-pixel.js','utf8')});
       if (url.endsWith('/checkout.js')) return route.fulfill({contentType:'application/javascript',body:fs.readFileSync(root+'/magellan-for-woocommerce/assets/magellan-v3-checkout.js','utf8')});
-      return route.fulfill({contentType:'text/html',body:'<!doctype html><html><head><title>Magellan isolated fixture</title></head><body><button data-magellan-component="hero" data-magellan-action="shop">Shop</button><form class="checkout"></form><script>window.MagellanV3Config='+JSON.stringify(config)+'</script><script src="/pixel.js"></script><script src="/checkout.js"></script></body></html>'});
+      return route.fulfill({contentType:'text/html',body:'<!doctype html><html><head><title>Magellan isolated fixture</title></head><body><button data-magellan-component="hero" data-magellan-action="shop">Shop</button><form class="checkout"></form><script>window.MagellanV3Config='+JSON.stringify(config)+';'+(initialConsent?'window.MagellanConsent='+JSON.stringify(initialConsent)+';':'')+'</script><script src="/pixel.js"></script><script src="/checkout.js"></script></body></html>'});
     });
     const page=await context.newPage(); const errors=[]; page.on('pageerror',e=>errors.push(e.message));
     await page.goto(config.origin+'/flowers/?utm_source=google&utm_medium=organic&gclid=synthetic_click&email=private@example.com');
@@ -86,6 +86,24 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
     await blocked.evaluate(()=>window.MagellanV3.flush());
     check('blocked storage reports page-local continuity',captured.filter(e=>e.event_type==='page_viewed').at(-1).payload.continuity==='page_local');
     await blocked.close();
+    mode='wrong_hash'; initialConsent=grant;
+    await page.goto(config.origin+'/retry/?gclid=queued_click');
+    await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await page.evaluate(()=>window.MagellanV3.flush());
+    check('failed browser receipt keeps raw click evidence while consent is granted',await page.evaluate(()=>localStorage.getItem('magellan:v3:site_fixture:queue').includes('queued_click')));
+    initialConsent={...grant,advertising:'denied'}; mode='accepted'; const beforeDenied=captured.length;
+    await page.goto(config.origin+'/next-consent/');
+    await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await page.evaluate(()=>window.MagellanV3.flush());
+    check('new page cannot resend old queued click IDs after advertising denial',captured.length>beforeDenied&&!JSON.stringify(captured.slice(beforeDenied)).includes('queued_click'));
+    mode='wrong_hash'; await page.evaluate(()=>window.MagellanV3.checkout('submitted')); await page.evaluate(()=>window.MagellanV3.flush());
+    config.installation_id='replacement_install'; mode='accepted'; const beforeReplace=captured.length;
+    await page.goto(config.origin+'/replacement/'); await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await page.evaluate(()=>window.MagellanV3.flush());
+    check('replacement installation discards the old pending queue',captured.length>beforeReplace&&captured.slice(beforeReplace).every(e=>e.installation_id==='replacement_install'));
+    for (const invalid of [{old_format:true},[null,7]]) {
+      await page.evaluate(value=>localStorage.setItem('magellan:v3:site_fixture:queue',JSON.stringify(value)),invalid);
+      const beforeRepair=captured.length; await page.reload(); await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await page.evaluate(()=>window.MagellanV3.flush());
+      check((Array.isArray(invalid)?'null entries':'object queue')+' recover in a real browser',captured.slice(beforeRepair).some(e=>e.event_type==='page_viewed'));
+    }
+    check('browser resilience scenarios produce no exceptions',errors.length===0);
     fs.writeFileSync(root+'/tests/browser-events.json',JSON.stringify(captured,null,2)+'\n');
     fs.writeFileSync(root+'/tests/browser-results.json',JSON.stringify({browser:browser.version(),transport:'intercepted collector responses; real isolated Chrome context',results},null,2)+'\n');
     console.log(results.length+' browser checks passed');

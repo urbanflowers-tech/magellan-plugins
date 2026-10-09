@@ -1,0 +1,89 @@
+{
+  "scope": "Shipped pixel executed in deterministic browser-API fixtures; synthetic data and no network",
+  "results": [
+    {
+      "test": "ordinary accepted events leave no pending queue",
+      "pass": true
+    },
+    {
+      "test": "failed delivery preserves event IDs and payloads for retry",
+      "pass": true
+    },
+    {
+      "test": "reloading with advertising denied cannot send retained raw click IDs",
+      "pass": true
+    },
+    {
+      "test": "new installation never reimports the previous installation queue",
+      "pass": true
+    },
+    {
+      "test": "malformed queue storage does not stop measurement startup",
+      "pass": true
+    },
+    {
+      "test": "null queue entries are discarded without stopping collection",
+      "pass": true
+    },
+    {
+      "test": "an invalid receipt timestamp cannot acknowledge delivery",
+      "pass": true
+    },
+    {
+      "test": "unknown analytics consent sends no events or persistent identifier",
+      "pass": true
+    },
+    {
+      "test": "denied analytics purges an existing pending queue and identifiers",
+      "pass": true
+    },
+    {
+      "test": "missing per-event receipt retains the original pending event",
+      "pass": true
+    },
+    {
+      "test": "different event ID retains the original pending event",
+      "pass": true
+    },
+    {
+      "test": "different body hash retains the original pending event",
+      "pass": true
+    },
+    {
+      "test": "non-string receipt ID retains the original pending event",
+      "pass": true
+    },
+    {
+      "test": "date-only receipt time retains the original pending event",
+      "pass": true
+    },
+    {
+      "test": "rejected event retains the original pending event",
+      "pass": true
+    },
+    {
+      "test": "partial receipts only remove the acknowledged event",
+      "pass": true
+    },
+    {
+      "test": "failed sends stop after five attempts and preserve pending events",
+      "pass": true
+    },
+    {
+      "test": "a page-close beacon never acknowledges delivery",
+      "pass": true
+    },
+    {
+      "test": "queue and outgoing batches remain bounded during a burst",
+      "pass": true
+    },
+    {
+      "test": "expired and implausibly future queued evidence is discarded",
+      "pass": true
+    },
+    {
+      "test": "simultaneous flush calls create only one in-flight batch",
+      "pass": true
+    }
+  ]
+}

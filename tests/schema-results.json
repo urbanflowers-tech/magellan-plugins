@@ -1,9 +1,10 @@
 {
-  "valid_events": 172,
+  "valid_events": 188,
   "event_types": [
     "cart_converted",
     "cart_emptied",
     "cart_snapshot",
+    "checkout_stage_observed",
     "checkout_started",
     "consent_changed",
     "entity_changed",
