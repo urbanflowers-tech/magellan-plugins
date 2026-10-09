@@ -12,6 +12,9 @@ final class Capture {
         add_action('woocommerce_checkout_create_order', [self::class, 'stamp'], 20);
         add_action('woocommerce_store_api_checkout_update_order_from_request', [self::class, 'stamp'], 20);
         add_action('woocommerce_checkout_order_created', [self::class, 'converted'], 30);
+        // Express handlers can create orders directly, then emit only this checkout hook.
+        // converted() freezes context once and deduplicates when normal checkout emits both.
+        add_action('woocommerce_checkout_order_processed', [self::class, 'converted'], 1);
         add_action('woocommerce_store_api_checkout_order_processed', [self::class, 'converted'], 30);
         add_action('woocommerce_order_status_changed', [self::class, 'status'], 30, 4);
         add_action('woocommerce_payment_complete', [self::class, 'payment'], 30);

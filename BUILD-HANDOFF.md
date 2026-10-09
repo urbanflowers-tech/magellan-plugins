@@ -1,8 +1,10 @@
 # Magellan WordPress plugin v3 — build and backend handoff
 
-**Build:** 3.0.0-alpha.1 · **Protocol/schema:** 3 / 3.0.0 · **Date:** 8 October 2026
+**Build:** 3.0.0-alpha.2 · **Protocol/schema:** 3 / 3.0.0 · **Date:** 9 October 2026
 
-This is an installable development candidate built from the existing `magellan-for-woocommerce` 2.5.0 repository. It has been exercised on an isolated WordPress/WooCommerce/MySQL installation and in an isolated Chrome context. Nothing has been installed on Urbanflowers, deployed to Magellan, pushed to GitHub, or published as an automatic update. Urbanflowers staging access has not yet been verified in this build; fitting the candidate to that storefront is the next integration step.
+This is an installable development candidate built from the existing `magellan-for-woocommerce` 2.5.0 repository. Alpha.1 was installed on the verified Urbanflowers staging site and passed initial installation checks and a sampled cart/checkout-entry journey. V3 remains disconnected pending the Magellan receiver; those hosted checks exercised legacy compatibility mode. Alpha.2 fixes a reproduced express-checkout attribution gap. No production deployment, Magellan backend deployment, GitHub push or automatic-update release has been performed.
+
+Urbanflowers' express-order handler creates a WooCommerce order directly and emits `woocommerce_checkout_order_processed`, bypassing the usual create/created checkout hooks. Alpha.2 observes that processed hook, freezes consented context once and deduplicates the normal path where both hooks fire. The actual merchant PHP handler was exercised with a synthetic provider object in a disposable installation, with HTTP and mail disabled. This does not certify a real Apple Pay, Google Pay or Stripe transaction.
 
 Magellan remains the autonomous operator and owner of inventory, canonical orders, payments and finance. The plugin collects channel evidence. It neither reserves stock nor books revenue, settles payments, computes attribution, sends advertisements, or edits storefront pages autonomously.
 
@@ -14,7 +16,7 @@ Magellan remains the autonomous operator and owner of inventory, canonical order
 | Delivery | Indexed MySQL outbox, immutable event IDs/bodies/hashes, leases, explicit retry/backoff, bounded batches, per-event receipts, authentication pause, conflict quarantine, replay, circuit delay, capacity reservations and bounded accepted-record cleanup |
 | Runner | One unique Action Scheduler drain; continuation after the action is marked complete; WordPress cron fallback; CLI drain and maintenance for low-traffic sites |
 | Browser | Direct Magellan intake, consent before optional tracking, store-namespaced host-only cookies, 30-minute sessions, entry-source evidence, page/product observations, registered interactions, checkout observations, bounded retries and cross-tab consent withdrawal |
-| Commerce | Actual WooCommerce order/line/amount snapshots; independent status/refund/payment observations; server-read carts with empty/converted lifecycles; Classic and Store API context hooks; snapshot deduplication and bounded reconciliation |
+| Commerce | Actual WooCommerce order/line/amount snapshots; independent status/refund/payment observations; server-read carts with empty/converted lifecycles; Classic, processed-order express fallback and Store API context hooks; snapshot deduplication and bounded reconciliation |
 | Privacy | Explicit consent event API plus Cookiebot adapter; GPC restricts advertising; advertising IDs suppressed when that purpose is not granted; local export/erasure hooks and backend erasure requests |
 | Presentation | Coalesced page/product presentation-change hints and channel tombstones; page-type override in the WordPress editor; no stock data in presentation hints |
 | Diagnostics | Connection, capture, receipts, runner execution, backlog, gaps and recent errors are separate; a receipt does not claim report application |
@@ -154,14 +156,14 @@ All checks below passed for this build:
 
 | Check | Result |
 |---|---|
-| WooCommerce legacy order storage | 51 integration checks |
-| WooCommerce HPOS order storage | The same 51 integration checks |
-| Isolated Chrome browser | 20 checks |
-| Cross-language contracts | 149 checks |
-| JSON Schemas | 166 valid event fixtures accepted; 3 invalid fixtures rejected |
+| WordPress 7.1.3 / WooCommerce 11.2.0 | 51 integration plus 10 merchant express-checkout checks in each of legacy and HPOS storage |
+| WordPress 6.9.4 / WooCommerce 9.9.5 (staging software versions) | The same 51 integration plus 10 express-checkout checks in each storage mode |
+| Isolated Chrome browser | 20 checks passed for the unchanged browser assets in alpha.1; not rerun for this PHP-only fix |
+| Cross-language contracts | 155 checks |
+| JSON Schemas | 172 valid event fixtures accepted; 3 invalid fixtures rejected |
 | PHP syntax | 18 files clean |
 
-The integration runtime was WordPress 7.1.3, WooCommerce 11.2.0, PHP 8.2.29 and MySQL 8.4.0. Browser checks ran on Chrome 155.0.8059.40. The core browser script is 5,335 bytes gzipped; its checkout adapter is 645 bytes gzipped. A local fixture of 100 small event captures measured 3.89 ms at p95; this is a bounded local capture measurement, not a checkout or Core Web Vitals benchmark.
+Both isolated WordPress/WooCommerce pairs used PHP 8.2.29 and MySQL 8.4.0. Hosted staging uses PHP 8.2.34 and MariaDB 10.11.18; matching the WordPress/WooCommerce versions does not reproduce the entire host. Browser checks ran on Chrome 155.0.8059.40. The unchanged core browser script is 5,335 bytes gzipped; its checkout adapter is 645 bytes gzipped. The latest local fixture of 100 small event captures measured 11.04 ms at p95; this is a local capture measurement, not a checkout or Core Web Vitals benchmark or a production performance gate.
 
 The source bundle contains the executable tests and their saved results. PHP integration tests use real WordPress, WooCommerce, MySQL and Action Scheduler, with simulated Magellan HTTP outcomes. Browser tests use a real isolated Chrome context with an intercepted collector. Signature/schema tests join these fixtures across languages.
 

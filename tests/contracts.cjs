@@ -7,5 +7,8 @@ for(const v of vectors){
 }
 assert.equal(target('/path?z=one+two&a=2&a=1'),'/path?a=1&a=2&z=one%2Btwo');count++;
 for(const v of JSON.parse(fs.readFileSync(root+'/tests/event-byte-fixtures.json'))){assert.equal(eventHash(JSON.parse(v.json)),v.sha256);count++;}
+if(fs.existsSync(root+'/tests/custom-checkout-byte-fixtures.json')){
+ for(const v of JSON.parse(fs.readFileSync(root+'/tests/custom-checkout-byte-fixtures.json'))){assert.equal(eventHash(JSON.parse(v.json)),v.sha256);count++;}
+}
 const result={checks:count,pass:true,scope:'PHP producer event bytes match Node receiver hashes; HMAC, query canonicalization, changed bytes and expired timestamps'};
 fs.writeFileSync(root+'/tests/contract-results.json',JSON.stringify(result,null,2)+'\n');console.log(count+' cross-language contract checks passed');

@@ -3,7 +3,7 @@ Contributors: magellan
 Tags: analytics, woocommerce, attribution
 Requires at least: 6.0
 Requires PHP: 8.0
-Stable tag: 3.0.0-alpha.1
+Stable tag: 3.0.0-alpha.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Consent-controlled website measurement and durable channel evidence for Magellan
 == Description ==
 Magellan owns inventory, canonical orders and finance. This plugin supplies website observations and WooCommerce channel facts through a durable local outbox.
 
-This is a development candidate. The v3 Magellan backend must be implemented and verified before connection. Urbanflowers staging and deployment are separate later steps.
+This is a development candidate. The v3 Magellan backend must be implemented and verified before connection. Storefront-specific staging and end-to-end verification remain required before production deployment.
 
 Features: direct browser event intake, host-only identity cookies, consent and GPC controls, page/product and checkout observations, WooCommerce order/refund/cart evidence, exact money strings, signed asynchronous delivery, per-event receipts, explicit retry, diagnostics and privacy hooks.
 
@@ -35,6 +35,11 @@ wp magellan maintenance
 See BUILD-HANDOFF.md in the source bundle for schemas, endpoint contracts, migration, validation results and release gates.
 
 == Changelog ==
+
+= 3.0.0-alpha.2 =
+* Preserve consented source/session and server-cart links for express checkout handlers that emit only the processed-order hook.
+* Keep ordinary checkout conversion idempotent and preserve analytics erasure.
+* Add regression tests against the actual Urbanflowers express-order handler in an isolated environment.
 = 3.0.0-alpha.1 =
 * Added store-scoped v3 protocol and signed challenge.
 * Added durable MySQL outbox, explicit retries, receipts, capacity limits and diagnostics.
