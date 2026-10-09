@@ -38,6 +38,34 @@
       "pass": true
     },
     {
+      "test": "store-enabled analytics starts without claiming visitor consent or granting advertising",
+      "pass": true
+    },
+    {
+      "test": "GPC prevents automatic store-enabled collection",
+      "pass": true
+    },
+    {
+      "test": "default policy does not auto-enable analytics",
+      "pass": true
+    },
+    {
+      "test": "a configured consent manager remains in control before a response",
+      "pass": true
+    },
+    {
+      "test": "an explicit denial survives navigation and cannot be replaced by store policy",
+      "pass": true
+    },
+    {
+      "test": "saved opt-out takes precedence over stale initial grants until an explicit new choice",
+      "pass": true
+    },
+    {
+      "test": "returning to consent-required mode discards store-policy queued events",
+      "pass": true
+    },
+    {
       "test": "missing per-event receipt retains the original pending event",
       "pass": true
     },

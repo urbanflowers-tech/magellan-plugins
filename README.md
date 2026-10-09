@@ -34,3 +34,7 @@ Alpha.4 adds an explicit measurement-only pilot mode. The backend must return ma
 ## Alpha.5 review fixes
 
 Read [REVIEW-RESPONSE-alpha.5.md](REVIEW-RESPONSE-alpha.5.md) for verified findings and Magellan-specific decisions. Run `tests/review-regressions.php` with the same disposable WP-CLI fixture; it includes the general integration setup. After the pilot fixture, `tests/legacy-regressions.php` requires the synthetic legacy base `https://example.com/magellan` and intercepts all HTTP/mail. `tests/uninstall-regressions.php` intentionally deletes local plugin tables in the disposable fixture and must run last. Saved `alpha5` files identify each WordPress/WooCommerce/storage-mode result. The declared WooCommerce minimum is 9.9.
+
+## Store analytics candidate
+
+See [STORE-ANALYTICS.md](STORE-ANALYTICS.md) for alpha.6 policy semantics, paired receiver requirements, checks and controlled activation.

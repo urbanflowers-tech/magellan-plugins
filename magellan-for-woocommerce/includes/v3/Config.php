@@ -17,6 +17,14 @@ final class Config {
         return self::active() && ($c['origin'] ?? '') === self::origin() && ($c['wp_environment'] ?? '') === wp_get_environment_type();
     }
     public static function analytics(): bool { return self::ready() && !empty(self::get()['analytics_enabled']) && apply_filters('magellan_tracking_enabled', true); }
+    public static function analytics_allowed(array $consent): bool {
+        if (!self::analytics()) { return false; }
+        return ($consent['analytics'] ?? '') === 'granted' || (
+            (self::get()['analytics_policy'] ?? 'consent_required') === 'store_enabled' &&
+            ($consent['analytics'] ?? '') === 'not_applicable' &&
+            ($consent['source'] ?? '') === 'store_policy' && empty($consent['gpc'])
+        );
+    }
     public static function endpoint(string $url): bool {
         $p = wp_parse_url($url);
         if (!$p || ($p['scheme'] ?? '') !== 'https' || isset($p['user']) || isset($p['pass']) || isset($p['fragment']) || isset($p['query'])) { return false; }
@@ -42,6 +50,8 @@ final class Config {
         $c['analytics_enabled'] = !empty($p['analytics_enabled']);
         $c['collection_mode'] = $p['collection_mode'] ?? 'full';
         if (!in_array($c['collection_mode'], ['full','measurement_only'], true)) { throw new \InvalidArgumentException('invalid_collection_mode'); }
+        $c['analytics_policy'] = $p['analytics_policy'] ?? 'consent_required';
+        if (!in_array($c['analytics_policy'], ['consent_required','store_enabled'], true)) { throw new \InvalidArgumentException('invalid_analytics_policy'); }
         $c['policy_version'] = sanitize_key($p['policy_version'] ?? '1');
         $c['wp_environment'] = wp_get_environment_type();
         return $c;
@@ -53,12 +63,13 @@ final class Config {
                 return new \WP_Error('unresolved_outbox', 'Resolve or export the old installation queue before rebinding this site.', ['status' => 409]);
             }
             $nonce = wp_generate_uuid4();
-            $body = Protocol::json(['schema_version' => '3.0.0', 'installation_id' => $c['installation_id'], 'site_id' => $c['site_id'], 'environment' => $c['environment'], 'origin' => $c['origin'], 'collection_mode' => $c['collection_mode'], 'challenge' => $nonce]);
+            $body = Protocol::json(['schema_version' => '3.0.0', 'installation_id' => $c['installation_id'], 'site_id' => $c['site_id'], 'environment' => $c['environment'], 'origin' => $c['origin'], 'collection_mode' => $c['collection_mode'], 'analytics_policy' => $c['analytics_policy'], 'challenge' => $nonce]);
             $response = wp_safe_remote_post($c['challenge_url'], ['body' => $body, 'headers' => Protocol::headers($c, 'POST', $c['challenge_url'], $body), 'timeout' => 8, 'redirection' => 0, 'limit_response_size' => 16384]);
             if (is_wp_error($response)) { throw new \RuntimeException('challenge_unreachable'); }
             $r = json_decode(wp_remote_retrieve_body($response), true);
             if (wp_remote_retrieve_response_code($response) !== 200 || !is_array($r) || ($r['challenge'] ?? '') !== $nonce || ($r['installation_id'] ?? '') !== $c['installation_id'] || ($r['site_id'] ?? '') !== $c['site_id'] || ($r['environment'] ?? '') !== $c['environment'] || ($r['schema_version'] ?? '') !== '3.0.0' || empty($r['durable_intake_ready'])) { throw new \RuntimeException('challenge_not_confirmed'); }
             if (($r['collection_mode'] ?? 'full') !== $c['collection_mode']) { throw new \RuntimeException('collection_mode_not_confirmed'); }
+            if (($r['analytics_policy'] ?? 'consent_required') !== $c['analytics_policy']) { throw new \RuntimeException('analytics_policy_not_confirmed'); }
             $c['connected_at'] = gmdate('c');
             $c['tracking_started_at'] = $old['tracking_started_at'] ?? null;
             update_option(self::OPTION, $c, false);
