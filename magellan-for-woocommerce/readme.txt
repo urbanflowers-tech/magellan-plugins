@@ -3,7 +3,7 @@ Contributors: magellan
 Tags: analytics, woocommerce, attribution
 Requires at least: 6.0
 Requires PHP: 8.0
-Stable tag: 3.0.0-alpha.5
+Stable tag: 3.0.0-alpha.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,9 @@ wp magellan maintenance
 See the bundled BUILD-HANDOFF.md and the source repository for schemas, endpoint contracts, migration, validation results and release gates.
 
 == Changelog ==
+
+= 3.0.0-alpha.6 =
+* Installation-bound store analytics policy, with explicit opt-out and unchanged advertising consent. Requires the paired receiver.
 
 = 3.0.0-alpha.5 =
 * Round WooCommerce sub-minor tax amounts using decimal string arithmetic.

@@ -1,4 +1,4 @@
-/* Magellan v3: consent-controlled observations. No purchase or inventory authority. */
+/* Magellan v3: store-configured analytics observations. No purchase or inventory authority. */
 (function (w, d) {
   'use strict';
   var c = w.MagellanV3Config;
@@ -45,10 +45,21 @@
     input = input || {};
     var out = {source:String(input.source || 'unavailable').slice(0,64),effective_at:now(),policy_version:c.policy_version,epoch:Math.max(0,Number(input.epoch) || Date.now()),gpc:navigator.globalPrivacyControl === true};
     ['analytics','advertising','email_marketing','sms_marketing'].forEach(function (k) { out[k] = states.includes(input[k]) ? input[k] : 'unknown'; });
-    if (out.gpc) out.advertising = 'denied';
+    if (out.source === 'store_policy' && getCookie('_mgln_v3_optout') === '1') out.analytics = 'denied';
+    if (out.gpc) { out.advertising = 'denied'; if (out.source === 'store_policy') out.analytics = 'denied'; }
     return out;
   }
-  function allowed() { return !stopped && consent && consent.analytics === 'granted'; }
+  function analyticsAllowed(value) {
+    return value && (value.analytics === 'granted' || (c.analytics_policy === 'store_enabled' && value.analytics === 'not_applicable' && value.source === 'store_policy' && !value.gpc));
+  }
+  function allowed() { return !stopped && analyticsAllowed(consent); }
+  function initialConsent() {
+    // A store setting is not visitor consent. A configured consent manager keeps control.
+    if (getCookie('_mgln_v3_optout') === '1') return {analytics:'denied',source:'saved_optout'};
+    if (w.MagellanConsent) return w.MagellanConsent;
+    if (w.Cookiebot) return {};
+    return c.analytics_policy === 'store_enabled' ? {analytics:'not_applicable',advertising:'denied',source:'store_policy'} : {};
+  }
   function context() {
     if (!allowed() || !session || !persistent) return;
     var ctx = {site_id:c.site_id,visitor_id:visitor,session_id:session.id,entry:session.entry,checkout_attempt_id:attempt,updated_at:Math.floor(Date.now()/1000),consent:consent};
@@ -71,7 +82,7 @@
     return prior !== session.id;
   }
   function pendingAllowed(e) {
-    if (!e || typeof e !== 'object' || e.site_id!==c.site_id || e.installation_id!==c.installation_id || e.environment!==c.environment || e.producer!=='browser' || e.visitor_id!==visitor || !e.consent || e.consent.analytics!=='granted') return false;
+    if (!e || typeof e !== 'object' || e.site_id!==c.site_id || e.installation_id!==c.installation_id || e.environment!==c.environment || e.producer!=='browser' || e.visitor_id!==visitor || !e.consent || !analyticsAllowed(e.consent)) return false;
     // Keep immutable event bodies: discard evidence whose captured permissions exceed current consent.
     if (['advertising','email_marketing','sms_marketing'].some(function (purpose) { return e.consent[purpose]==='granted' && consent[purpose]!=='granted'; })) return false;
     var age=Date.now()-Date.parse(e.captured_at);
@@ -164,9 +175,12 @@
     cookie('_mgln_v3_visitor','',0); cookie('_mgln_v3_context','',0); visitor=null; session=null; persistent=false; started=false; attempt=null;
   }
   function updateConsent(input, broadcast) {
-    if (w.Magellan && typeof w.Magellan.setConsent==='function') w.Magellan.setConsent(input,false);
+    // Store analytics never grants permissions to the independent legacy/advertising pixel.
+    if (input && input.source !== 'store_policy' && w.Magellan && typeof w.Magellan.setConsent==='function') w.Magellan.setConsent(input,false);
     var next=normalize(input), previous=consent;
-    var same=previous && ['analytics','advertising','email_marketing','sms_marketing','gpc'].every(function (k) { return previous[k] === next[k]; });
+    if (next.analytics === 'denied' && next.source !== 'store_policy') cookie('_mgln_v3_optout','1',31536000);
+    else if (next.analytics === 'granted') cookie('_mgln_v3_optout','',0);
+    var same=previous && ['analytics','advertising','email_marketing','sms_marketing','gpc','source'].every(function (k) { return previous[k] === next[k]; });
     if (same) return initialized;
     if (inFlight) inFlight.abort();
     consent=next; attempts=0;
@@ -205,8 +219,8 @@
   d.addEventListener('click',function (event) { var el=event.target.closest && event.target.closest('[data-magellan-component]'); if (el) w.MagellanV3.interaction(el.getAttribute('data-magellan-component'),el.getAttribute('data-magellan-action') || 'click'); });
   if (channel) channel.onmessage=function (event) { updateConsent(event.data,false); };
   w.addEventListener('magellan:consent',function (event) { updateConsent(event.detail); });
-  function cookiebot() { var b=w.Cookiebot; if (!b || !b.hasResponse) return; updateConsent({analytics:b.consent.statistics ? 'granted':'denied',advertising:b.consent.marketing ? 'granted':'denied',source:'cookiebot'}); }
-  ['CookiebotOnConsentReady','CookiebotOnAccept','CookiebotOnDecline'].forEach(function (name) { w.addEventListener(name,cookiebot); });
+  function cookiebot(explicitChoice) { var b=w.Cookiebot; if (!b || !b.hasResponse || (!explicitChoice && getCookie('_mgln_v3_optout') === '1')) return; updateConsent({analytics:b.consent.statistics ? 'granted':'denied',advertising:b.consent.marketing ? 'granted':'denied',source:'cookiebot'}); }
+  ['CookiebotOnConsentReady','CookiebotOnAccept','CookiebotOnDecline'].forEach(function (name) { w.addEventListener(name,function () { cookiebot(name === 'CookiebotOnAccept' || name === 'CookiebotOnDecline'); }); });
   w.addEventListener('storage',function (event) {
     if (event.key === prefix+'session' && allowed() && session) {
       var other=read('session');
@@ -216,5 +230,5 @@
   w.addEventListener('online',function () { attempts=0; flush(false); });
   d.addEventListener('visibilitychange',function () { if (d.visibilityState==='hidden') flush(true); });
   w.addEventListener('pagehide',function () { flush(true); });
-  updateConsent(w.MagellanConsent || {}); cookiebot();
+  updateConsent(initialConsent()); cookiebot();
 })(window, document);

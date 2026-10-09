@@ -1,0 +1,23 @@
+name: Collector contracts
+on:
+  pull_request:
+  push:
+    branches: [codex/store-analytics]
+permissions:
+  contents: read
+jobs:
+  collector-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: PHP syntax
+        run: find magellan-for-woocommerce -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Activation and checkout policy
+        run: php tests/store-policy.php
+      - name: Receipt and signature compatibility
+        run: node tests/contracts.cjs
+      - name: Browser collector policy and delivery
+        run: node tests/pixel-resilience.cjs

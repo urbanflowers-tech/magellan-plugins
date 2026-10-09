@@ -34,7 +34,7 @@ final class Capture {
         $raw = isset($_COOKIE[$cookie_name]) ? wp_unslash($_COOKIE[$cookie_name]) : '';
         if (!is_string($raw) || strlen($raw) > 3800) { return $base; }
         $c = json_decode($raw, true);
-        if (!is_array($c) || ($c['consent']['analytics'] ?? '') !== 'granted' || ($c['site_id'] ?? '') !== (Config::get()['site_id'] ?? '') || !is_numeric($c['updated_at'] ?? null) || abs(time() - (int) $c['updated_at']) > 1800) { return $base; }
+        if (!is_array($c) || !is_array($c['consent'] ?? null) || !Config::analytics_allowed($c['consent']) || ($c['site_id'] ?? '') !== (Config::get()['site_id'] ?? '') || !is_numeric($c['updated_at'] ?? null) || abs(time() - (int) $c['updated_at']) > 1800) { return $base; }
         foreach (['analytics','advertising','email_marketing','sms_marketing'] as $purpose) {
             $v = $c['consent'][$purpose] ?? 'unknown'; $base['consent'][$purpose] = in_array($v, ['granted','denied','unknown','not_applicable'], true) ? $v : 'unknown';
         }

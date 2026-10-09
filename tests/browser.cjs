@@ -14,6 +14,12 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
   const browser = await chromium.launch({headless:true,...(process.env.CHROME_EXECUTABLE ? {executablePath:process.env.CHROME_EXECUTABLE} : {})});
   try {
     const context = await browser.newContext(); let mode = 'accepted', initialConsent = null;
+    // flush() may return while an automatic send is already in flight. Wait for
+    // acknowledged queue drainage before asserting delivery; retain wrong-hash checks.
+    async function flushPage(p) {
+      await p.evaluate(()=>window.MagellanV3.flush());
+      if(mode==='accepted') await p.waitForFunction(()=>JSON.parse(localStorage.getItem('magellan:v3:site_fixture:queue')||'[]').length===0);
+    }
     await context.route('**/*',async route => {
       const request=route.request(); const url=request.url();
       if (url.startsWith('https://collector.example/')) {
@@ -32,7 +38,7 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
     if (legacyPilot) check('unknown consent creates no legacy identifiers',!(await context.cookies()).some(c=>['_mgln','_mgln_cart_token'].includes(c.name)));
     check('unknown consent creates no visitor cookie',!(await context.cookies()).some(c=>c.name==='_mgln_v3_visitor_site_fixture'));
     await page.evaluate(g=>window.MagellanV3.setConsent(g),grant);
-    await page.evaluate(()=>window.MagellanV3.flush());
+    await flushPage(page);
     check('consented page/product/checkout events captured',['page_viewed','product_viewed','checkout_started'].every(t=>captured.some(e=>e.event_type===t)));
     if (legacyPilot) { await page.evaluate(()=>delete window.MagellanConsent);await page.addScriptTag({url:config.origin+'/legacy.js'});check('deferred legacy pixel inherits current v3 consent',await page.evaluate(()=>window.Magellan.consent().analytics==='granted')); }
     const first=captured.find(e=>e.event_type==='page_viewed');
@@ -43,25 +49,25 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
     await context.addInitScript(g=>window.MagellanConsent=g,grant);
     await page.goto(config.origin+'/second/?utm_source=facebook&utm_medium=cpc');
     await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve)));
-    await page.evaluate(()=>window.MagellanV3.flush());
+    await flushPage(page);
     const second=captured.filter(e=>e.event_type==='page_viewed').at(-1);
     check('navigation retains visitor and session',second.visitor_id===first.visitor_id&&second.session_id===first.session_id);
     check('entry origin stays frozen, later source retained',second.payload.entry.source_evidence.utm.source==='google'&&second.payload.source_evidence.utm.source==='facebook');
     const other=await context.newPage(); await other.goto(config.origin+'/other');
     await other.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve)));
-    await other.evaluate(()=>window.MagellanV3.flush());
+    await flushPage(other);
     check('second tab shares session',captured.filter(e=>e.event_type==='page_viewed').at(-1).session_id===first.session_id);
     mode='wrong_hash';
     await Promise.all([page.evaluate(()=>{window.MagellanV3.registerInteraction('tab-one');window.MagellanV3.interaction('tab-one','click');}),other.evaluate(()=>{window.MagellanV3.registerInteraction('tab-two');window.MagellanV3.interaction('tab-two','click');})]);
-    await Promise.all([page.evaluate(()=>window.MagellanV3.flush()),other.evaluate(()=>window.MagellanV3.flush())]);
+    await Promise.all([flushPage(page),flushPage(other)]);
     check('concurrent tabs retain both unacknowledged events',await page.evaluate(()=>{const q=JSON.parse(localStorage.getItem('magellan:v3:site_fixture:queue'));return ['tab-one','tab-two'].every(id=>q.some(e=>e.payload.component_id===id));}));
-    mode='accepted'; await page.evaluate(()=>window.MagellanV3.flush()); await other.evaluate(()=>window.MagellanV3.flush());
+    mode='accepted'; await flushPage(page); await flushPage(other);
     const n=captured.length;
     await page.evaluate(()=>{window.MagellanV3.interaction('unregistered','click');window.MagellanV3.registerInteraction('hero');window.MagellanV3.interaction('hero','shop');});
-    await page.evaluate(()=>window.MagellanV3.flush());
+    await flushPage(page);
     check('only registered interactions emitted',captured.slice(n).filter(e=>e.event_type==='interaction_observed').length===1);
     mode='wrong_hash';
-    await page.evaluate(()=>window.MagellanV3.interaction('hero','shop')); await page.evaluate(()=>window.MagellanV3.flush());
+    await page.evaluate(()=>window.MagellanV3.interaction('hero','shop')); await flushPage(page);
     check('wrong receipt hash retains browser event',await page.evaluate(()=>JSON.parse(localStorage.getItem('magellan:v3:site_fixture:queue')).length>0));
     const legacyCookies = (await context.cookies()).filter(c=>['_mgln','_mgln_cart_token'].includes(c.name));
     const legacyIdentity = legacyPilot ? await page.evaluate(()=>window.Magellan.getCookie()) : null;
@@ -69,7 +75,7 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
     await other.waitForFunction(()=>localStorage.getItem('magellan:v3:site_fixture:queue')===null);
     const atRevoke=captured.length;
     await other.evaluate(()=>{window.MagellanV3.registerInteraction('hero');window.MagellanV3.interaction('hero','shop');});
-    await other.evaluate(()=>window.MagellanV3.flush());
+    await flushPage(other);
     check('withdrawal stops collection in the second tab',!captured.slice(atRevoke).some(e=>e.event_type==='interaction_observed'));
     await other.close();
     if (legacyPilot) {
@@ -78,16 +84,16 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
       check('withdrawal removes both legacy identifiers',!afterCookies.some(c=>['_mgln','_mgln_cart_token'].includes(c.name)) && Object.keys(await page.evaluate(()=>window.Magellan.getCookie())).length===0);
     }
     check('withdrawal clears identifiers and persisted queue',!(await context.cookies()).some(c=>c.name==='_mgln_v3_visitor_site_fixture')&&await page.evaluate(()=>localStorage.getItem('magellan:v3:site_fixture:queue')===null));
-    mode='accepted'; await page.evaluate(g=>window.MagellanV3.setConsent(g),grant); await page.evaluate(()=>window.MagellanV3.flush());
+    mode='accepted'; await page.evaluate(g=>window.MagellanV3.setConsent(g),grant); await flushPage(page);
     await page.waitForFunction(()=>JSON.parse(localStorage.getItem('magellan:v3:site_fixture:queue') || '[]').length===0);
     check('new consent does not resurrect erased visitor',captured.filter(e=>e.event_type==='page_viewed').at(-1).visitor_id!==first.visitor_id);
     await page.evaluate(g=>{Object.defineProperty(navigator,'globalPrivacyControl',{value:true,configurable:true});return window.MagellanV3.setConsent(g);},grant);
-    await page.evaluate(()=>{window.MagellanV3.registerInteraction('hero');window.MagellanV3.interaction('hero','shop');}); await page.evaluate(()=>window.MagellanV3.flush());
+    await page.evaluate(()=>{window.MagellanV3.registerInteraction('hero');window.MagellanV3.interaction('hero','shop');}); await flushPage(page);
     check('GPC prevents advertising grant',captured.at(-1).consent.gpc===true&&captured.at(-1).consent.advertising==='denied');
     check('advertising withdrawal removes saved raw click identifiers',await page.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('magellan:v3:site_fixture:session')).entry.source_evidence.click_ids).length===0));
     const oldVisitor=captured.filter(e=>e.event_type==='page_viewed').at(-1).visitor_id;
     await context.clearCookies();
-    await page.evaluate(()=>window.MagellanV3.interaction('hero','shop')); await page.evaluate(()=>window.MagellanV3.flush());
+    await page.evaluate(()=>window.MagellanV3.interaction('hero','shop')); await flushPage(page);
     check('cleared cookies cannot resurrect the old visitor',captured.at(-1).visitor_id!==oldVisitor);
     check('no browser exceptions',errors.length===0);
     const blocked=await context.newPage();
@@ -99,23 +105,23 @@ const config = {site_id:'site_fixture',installation_id:'install_fixture',environ
     await blocked.close();
     mode='wrong_hash'; initialConsent=grant;
     await page.goto(config.origin+'/retry/?gclid=queued_click');
-    await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await page.evaluate(()=>window.MagellanV3.flush());
+    await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await flushPage(page);
     check('failed browser receipt keeps raw click evidence while consent is granted',await page.evaluate(()=>localStorage.getItem('magellan:v3:site_fixture:queue').includes('queued_click')));
     initialConsent={...grant,advertising:'denied'}; mode='accepted'; const beforeDenied=captured.length;
     await page.goto(config.origin+'/next-consent/');
-    await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await page.evaluate(()=>window.MagellanV3.flush());
+    await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await flushPage(page);
     check('new page cannot resend old queued click IDs after advertising denial',captured.length>beforeDenied&&!JSON.stringify(captured.slice(beforeDenied)).includes('queued_click'));
-    mode='wrong_hash'; await page.evaluate(()=>window.MagellanV3.checkout('submitted')); await page.evaluate(()=>window.MagellanV3.flush());
+    mode='wrong_hash'; await page.evaluate(()=>window.MagellanV3.checkout('submitted')); await flushPage(page);
     config.installation_id='replacement_install'; mode='accepted'; const beforeReplace=captured.length;
-    await page.goto(config.origin+'/replacement/'); await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await page.evaluate(()=>window.MagellanV3.flush());
+    await page.goto(config.origin+'/replacement/'); await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await flushPage(page);
     check('replacement installation discards the old pending queue',captured.length>beforeReplace&&captured.slice(beforeReplace).every(e=>e.installation_id==='replacement_install'));
     for (const invalid of [{old_format:true},[null,7]]) {
       await page.evaluate(value=>localStorage.setItem('magellan:v3:site_fixture:queue',JSON.stringify(value)),invalid);
-      const beforeRepair=captured.length; await page.reload(); await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await page.evaluate(()=>window.MagellanV3.flush());
+      const beforeRepair=captured.length; await page.reload(); await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve))); await flushPage(page);
       check((Array.isArray(invalid)?'null entries':'object queue')+' recover in a real browser',captured.slice(beforeRepair).some(e=>e.event_type==='page_viewed'));
     }
     initialConsent=grant;const large=new URLSearchParams();for(const key of ['source','medium','campaign','content','term'])large.set('utm_'+key,'ด'.repeat(128));for(const key of ['gclid','gbraid','wbraid','fbclid','msclkid','ttclid','twclid'])large.set(key,'a'.repeat(200));
-    const beforeLarge=captured.length;await page.goto(config.origin+'/large-landing?'+large);await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve)));await page.evaluate(()=>window.MagellanV3.flush());
+    const beforeLarge=captured.length;await page.goto(config.origin+'/large-landing?'+large);await page.evaluate(()=>new Promise(resolve=>window.MagellanV3.whenReady(resolve)));await flushPage(page);
     for(let wait=0;wait<50&&!captured.slice(beforeLarge).some(e=>e.event_type==='page_viewed'&&e.payload.path==='/large-landing');wait++) await new Promise(resolve=>setTimeout(resolve,100));
     const largeEvent=captured.slice(beforeLarge).find(e=>e.event_type==='page_viewed'&&e.payload.path==='/large-landing');check('large paid landing survives in real Chrome within event budget',!!largeEvent&&Buffer.byteLength(JSON.stringify(largeEvent))<=4096&&largeEvent.payload.source_evidence.click_id_types.length===7);
     check('browser resilience scenarios produce no exceptions',errors.length===0);

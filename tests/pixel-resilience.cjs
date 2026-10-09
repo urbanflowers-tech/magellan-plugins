@@ -14,7 +14,7 @@ function tab(shared,options={}){
  const navigator={globalPrivacyControl:!!options.gpc,locks:{request(name,fn){const task=(shared.locks.get(name)||Promise.resolve()).then(fn);shared.locks.set(name,task.catch(()=>{}));return task;}}};
  navigator.sendBeacon=(url,body)=>{beacons.push({url,body});return true;};
  const localStorage={getItem:k=>shared.storage.get(k)??null,setItem:(k,v)=>shared.storage.set(k,String(v)),removeItem:k=>shared.storage.delete(k)};
- const window={MagellanV3Config:c,MagellanConsent:options.consent||grant,crypto:crypto.webcrypto,localStorage,addEventListener:(t,fn)=>{(listeners[t]??=[]).push(fn);},dispatchEvent:e=>{for(const fn of listeners[e.type]||[])fn(e);}};
+ const window={MagellanV3Config:c,MagellanConsent:options.noConsent ? undefined : options.consent||grant, Cookiebot:options.cookiebot,crypto:crypto.webcrypto,localStorage,addEventListener:(t,fn)=>{(listeners[t]??=[]).push(fn);},dispatchEvent:e=>{for(const fn of listeners[e.type]||[])fn(e);}};
  const fetch=async(url,opt)=>{const events=JSON.parse(opt.body).events;requests.push(opt);sent.push(...events);if(options.fail)throw new Error('simulated network failure');const receipts=events.map(e=>({event_id:e.event_id,body_hash:crypto.createHash('sha256').update(JSON.stringify(e)).digest('hex'),status:'accepted',receipt_id:'receipt_'+e.event_id,received_at:options.invalidReceiptDate?'invalid-time':new Date().toISOString()}));return {status:202,json:async()=>({results:options.receipts?options.receipts(receipts):receipts})};};
  const globals={window,document,navigator,location:new URL(options.url||c.origin+'/landing?utm_source=google&gclid=synthetic_click'),URL,TextEncoder,Uint8Array,Blob,AbortController,fetch,CustomEvent:class{constructor(type){this.type=type;}},setTimeout:(fn,ms)=>{timers.set(++seq,{fn,ms});return seq;},clearTimeout:key=>timers.delete(key),console};
  vm.runInNewContext(source,globals,{filename:'magellan-v3-pixel.js'});
@@ -53,7 +53,31 @@ async function check(name,fn){try{await fn();results.push({test:name,pass:true})
   const s=state(),t=tab(s,{consent:{analytics:'unknown'}});await t.ready();await t.flush();assert.equal(t.sent.length,0);assert.equal(s.cookies.size,0);t.stop();
  });
  await check('denied analytics purges an existing pending queue and identifiers',async()=>{
-  const s=state(),old=tab(s,{fail:true});await old.ready();await old.flush();const t=tab(s,{consent:{...grant,analytics:'denied',epoch:20}});await t.ready();await t.flush();assert.equal(t.sent.length,0);assert.equal(s.cookies.size,0);assert.ok(!s.storage.has('magellan:v3:resilience_site:queue'));old.stop();t.stop();
+  const s=state(),old=tab(s,{fail:true});await old.ready();await old.flush();const t=tab(s,{consent:{...grant,analytics:'denied',epoch:20}});await t.ready();await t.flush();assert.equal(t.sent.length,0);assert.deepEqual([...s.cookies.keys()],['_mgln_v3_optout_resilience_site']);assert.ok(!s.storage.has('magellan:v3:resilience_site:queue'));old.stop();t.stop();
+ });
+ await check('store-enabled analytics starts without claiming visitor consent or granting advertising',async()=>{
+  const s=state(),t=tab(s,{noConsent:true,config:{analytics_policy:'store_enabled'}});await tick();await t.flush();
+  const e=t.sent.find(e=>e.event_type==='page_viewed');assert.ok(e);assert.equal(e.consent.analytics,'not_applicable');assert.equal(e.consent.source,'store_policy');assert.equal(e.consent.advertising,'denied');assert.ok(!JSON.stringify(e).includes('synthetic_click'));
+  const next=tab(s,{noConsent:true,config:{analytics_policy:'store_enabled'},url:config.origin+'/next'});await tick();await next.flush();assert.equal(next.sent[0].session_id,e.session_id);next.stop();t.stop();
+ });
+ await check('GPC prevents automatic store-enabled collection',async()=>{const s=state(),t=tab(s,{noConsent:true,gpc:true,config:{analytics_policy:'store_enabled'}});await tick();await t.flush();assert.equal(t.sent.length,0);assert.equal(s.cookies.size,0);t.stop();});
+ await check('default policy does not auto-enable analytics',async()=>{const s=state(),t=tab(s,{noConsent:true});await tick();await t.flush();assert.equal(t.sent.length,0);assert.equal(s.cookies.size,0);t.stop();});
+ await check('a configured consent manager remains in control before a response',async()=>{const s=state(),t=tab(s,{noConsent:true,cookiebot:{hasResponse:false},config:{analytics_policy:'store_enabled'}});await tick();await t.flush();assert.equal(t.sent.length,0);assert.equal(s.cookies.size,0);t.stop();});
+ await check('an explicit denial survives navigation and cannot be replaced by store policy',async()=>{
+  const s=state(),t=tab(s,{noConsent:true,config:{analytics_policy:'store_enabled'}});await tick();await t.flush();
+  await t.api.setConsent({analytics:'denied',source:'test_cmp'});assert.equal(t.sent.at(-1).event_type,'consent_changed');assert.equal(queue(s).length,0);
+  await t.api.setConsent({analytics:'not_applicable',source:'store_policy'});await t.flush();assert.equal(t.api.getConsent().analytics,'denied');
+  const next=tab(s,{noConsent:true,config:{analytics_policy:'store_enabled'}});await tick();await next.flush();assert.equal(next.sent.length,0);assert.deepEqual([...s.cookies.keys()],['_mgln_v3_optout_resilience_site']);next.stop();t.stop();
+ });
+ await check('saved opt-out takes precedence over stale initial grants until an explicit new choice',async()=>{
+  const s=state();s.cookies.set('_mgln_v3_optout_resilience_site','1');
+  const t=tab(s,{consent:grant,cookiebot:{hasResponse:true,consent:{statistics:true,marketing:true}},config:{analytics_policy:'store_enabled'}});
+  await tick();await t.flush();assert.equal(t.sent.length,0);assert.equal(t.api.getConsent().analytics,'denied');
+  await t.api.setConsent(grant);await tick();await t.flush();assert.ok(t.sent.some(e=>e.event_type==='page_viewed'));assert.ok(!s.cookies.has('_mgln_v3_optout_resilience_site'));t.stop();
+ });
+ await check('returning to consent-required mode discards store-policy queued events',async()=>{
+  const s=state(),t=tab(s,{noConsent:true,fail:true,config:{analytics_policy:'store_enabled'}});await tick();await t.flush();assert.ok(queue(s).length);
+  const next=tab(s,{consent:grant});await next.ready();await next.flush();assert.ok(next.sent.length);assert.ok(next.sent.every(e=>e.consent.analytics==='granted'));next.stop();t.stop();
  });
  for (const [name,receipts] of [
   ['missing per-event receipt',()=>[]],
